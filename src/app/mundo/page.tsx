@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { KnowledgeStatus } from "@/components/KnowledgeStatus";
 import { PublicPage } from "@/components/PublicPage";
+import { RouteCompass } from "@/components/RouteCompass";
 import { knownPlaces, officialTimeline, spoilerBoundary } from "@/content/playerKnowledge";
 import { knownTravelDistances } from "@/content/travel";
 
@@ -81,32 +82,15 @@ export default function MundoPage() {
         <header className="lore-section__heading">
           <div>
             <p className="kicker">Estradas conhecidas</p>
-            <h2 id="travel-title">Distâncias a partir da capital</h2>
+            <h2 id="travel-title">Astrolábio das rotas</h2>
           </div>
           <p className="lore-section__aside">
-            Tempos aproximados usados pelos viajantes do reino. Terreno, clima, patrulhas e incidentes
-            podem alterar qualquer percurso.
+            Selecione um destino para orientar o instrumento a partir da capital. O registro continua
+            usando apenas tempos e distâncias já liberados aos jogadores.
           </p>
         </header>
 
-        <div className="travel-table travel-table--ritual" role="table" aria-label="Distâncias conhecidas de Injorn">
-          <div className="travel-table__row travel-table__row--head" role="row">
-            <span role="columnheader">Destino</span>
-            <span role="columnheader">Direção</span>
-            <span role="columnheader">A cavalo</span>
-            <span role="columnheader">A pé</span>
-            <span role="columnheader">Distância</span>
-          </div>
-          {knownTravelDistances.map((route) => (
-            <div className="travel-table__row" role="row" key={route.destination}>
-              <strong role="cell">{route.destination}</strong>
-              <span role="cell">{route.direction}</span>
-              <span role="cell">{route.horseback}</span>
-              <span role="cell">{route.onFoot}</span>
-              <span role="cell">{route.distance}</span>
-            </div>
-          ))}
-        </div>
+        <RouteCompass records={knownTravelDistances} />
       </section>
 
       <section className="lore-section" aria-labelledby="timeline-title">
