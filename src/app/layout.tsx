@@ -19,6 +19,7 @@ import "./migarazur-seal-fix.css";
 import "./living-layer.css";
 import "./seven-gates.css";
 import "./route-compass.css";
+import "./identity-expansion.css";
 
 const display = Cormorant_Garamond({
   subsets: ["latin"],
