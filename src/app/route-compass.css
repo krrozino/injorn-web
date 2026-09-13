@@ -1,0 +1,93 @@
+/* Interactive atlas compass. The destination is selected first; the route then resolves around Injorn. */
+.route-compass {
+  --route-angle: 0deg;
+  display:grid;
+  grid-template-columns:minmax(18rem,.9fr) minmax(15rem,.75fr) minmax(18rem,.9fr);
+  gap:clamp(1.2rem,3vw,3rem);
+  align-items:center;
+  margin-top:1.8rem;
+  padding:clamp(1.2rem,3vw,2.4rem);
+  border:1px solid var(--line);
+  background:radial-gradient(circle at 27% 50%,rgba(202,166,93,.055),transparent 26rem),linear-gradient(145deg,rgba(18,33,23,.55),rgba(5,9,7,.82));
+  overflow:hidden;
+  position:relative;
+}
+.route-compass::before { content:""; position:absolute; inset:0; pointer-events:none; background:repeating-linear-gradient(90deg,transparent 0 4rem,rgba(230,204,141,.018) 4.03rem 4.08rem),repeating-linear-gradient(0deg,transparent 0 4rem,rgba(230,204,141,.014) 4.03rem 4.08rem); }
+
+.route-compass__dial { position:relative; width:min(34vw,25rem); max-width:100%; aspect-ratio:1; justify-self:center; border-radius:50%; display:grid; place-items:center; filter:drop-shadow(0 1rem 2.4rem rgba(0,0,0,.34)); }
+.route-compass__ring { position:absolute; border-radius:50%; border:1px solid rgba(230,204,141,.22); }
+.route-compass__ring--outer { inset:0; border-style:dashed; animation:compass-ring-spin 28s linear infinite; }
+.route-compass__ring--middle { inset:10%; border-color:rgba(230,204,141,.12); box-shadow:inset 0 0 3rem rgba(202,166,93,.025); }
+.route-compass__ring--inner { inset:28%; border-color:rgba(230,204,141,.18); }
+.route-compass__ring--inner::before,.route-compass__ring--inner::after { content:""; position:absolute; inset:15%; border:1px solid rgba(230,204,141,.11); transform:rotate(45deg); }
+.route-compass__axis { position:absolute; background:linear-gradient(transparent,rgba(230,204,141,.13),transparent); }
+.route-compass__axis--vertical { width:1px; height:92%; }
+.route-compass__axis--horizontal { height:1px; width:92%; }
+.route-compass__cardinal { position:absolute; color:rgba(239,229,203,.5); font-family:var(--font-display),serif; font-size:.72rem; letter-spacing:.12em; }
+.route-compass__cardinal--n { top:3%; }
+.route-compass__cardinal--e { right:4%; }
+.route-compass__cardinal--s { bottom:3%; }
+.route-compass__cardinal--w { left:4%; }
+.route-compass__capital { position:relative; z-index:4; width:5.5rem; aspect-ratio:1; display:grid; place-items:center; border-radius:50%; border:1px solid rgba(230,204,141,.45); background:radial-gradient(circle,rgba(202,166,93,.12),rgba(7,14,10,.96) 68%); color:#dec57f; font-family:var(--font-display),serif; font-size:.62rem; letter-spacing:.16em; box-shadow:0 0 0 .65rem rgba(202,166,93,.025),0 0 2.3rem rgba(202,166,93,.09); }
+.route-compass__ray { position:absolute; z-index:2; left:50%; top:50%; width:1px; height:45%; transform-origin:50% 0; transform:rotate(var(--route-angle)); background:linear-gradient(#e3c982,rgba(227,201,130,.42),transparent); box-shadow:0 0 1rem rgba(227,201,130,.42); transition:transform 900ms cubic-bezier(.16,1,.3,1); }
+.route-compass__needle { position:absolute; z-index:3; left:50%; top:50%; width:2px; height:42%; transform-origin:50% 0; transform:rotate(var(--route-angle)); transition:transform 900ms cubic-bezier(.16,1,.3,1); }
+.route-compass__needle::before { content:""; position:absolute; left:50%; top:-.25rem; width:.48rem; height:72%; transform:translateX(-50%); clip-path:polygon(50% 0,100% 100%,50% 82%,0 100%); background:linear-gradient(#e8cf8c,#785f31); box-shadow:0 0 1.2rem rgba(230,204,141,.25); }
+.route-compass__needle i { position:absolute; left:50%; top:-.08rem; width:.75rem; aspect-ratio:1; transform:translate(-50%,-50%) rotate(45deg); border:1px solid rgba(230,204,141,.65); background:#132017; }
+.route-compass__echo { position:absolute; inset:20%; border-radius:50%; opacity:0; }
+.route-compass__echo i { position:absolute; inset:0; border:1px solid rgba(119,165,111,.2); border-radius:50%; }
+.route-compass__echo i:nth-child(2){inset:-12%;opacity:.6}.route-compass__echo i:nth-child(3){inset:-25%;opacity:.35}
+
+.route-compass--all .route-compass__ray { opacity:.25; animation:all-route-spin 7s linear infinite; }
+.route-compass--all .route-compass__needle { animation:all-route-spin 7s linear infinite; }
+.route-compass--all .route-compass__ring--middle { box-shadow:0 0 2.4rem rgba(202,166,93,.1),inset 0 0 3rem rgba(202,166,93,.04); animation:compass-breathe 2.8s ease-in-out infinite; }
+
+.route-compass--vael .route-compass__echo { opacity:1; animation:vael-route-echo 2.7s ease-in-out infinite; }
+.route-compass--vael .route-compass__capital { border-color:rgba(119,165,111,.38); box-shadow:0 0 0 .65rem rgba(119,165,111,.025),0 0 2.8rem rgba(119,165,111,.12); }
+.route-compass--vael .route-compass__needle::before { background:linear-gradient(#8fbbb1,#866f3b); }
+
+.route-compass__routes { position:relative; z-index:2; }
+.route-compass__routes > .kicker { margin-bottom:.8rem; }
+.route-compass__route-list { display:grid; }
+.route-compass__route-list button { display:grid; grid-template-columns:2.2rem 1fr auto; gap:.7rem; align-items:center; width:100%; padding:.72rem 0; border:0; border-top:1px solid rgba(230,204,141,.09); background:transparent; color:inherit; text-align:left; cursor:pointer; transition:background 220ms ease,padding 300ms var(--ease-out),border-color 220ms ease; }
+.route-compass__route-list button:last-child { border-bottom:1px solid rgba(230,204,141,.09); }
+.route-compass__route-list button:hover,.route-compass__route-list button:focus-visible { padding-left:.45rem; background:linear-gradient(90deg,rgba(202,166,93,.06),transparent); }
+.route-compass__route-list button.is-active { padding-left:.45rem; border-color:rgba(230,204,141,.23); background:linear-gradient(90deg,rgba(202,166,93,.085),transparent); }
+.route-compass__route-list button > span { color:rgba(230,204,141,.32); font-family:var(--font-display),serif; font-size:.7rem; }
+.route-compass__route-list strong { font-family:var(--font-display),serif; font-size:.9rem; font-weight:600; line-height:1.05; }
+.route-compass__route-list small { color:rgba(239,229,203,.45); font-size:.5rem; letter-spacing:.09em; text-transform:uppercase; }
+.route-compass__route-list button.is-active strong { color:#e3cd94; }
+
+.route-compass__manifest { position:relative; z-index:2; min-height:20rem; padding:clamp(1.2rem,2vw,1.8rem); border-left:1px solid rgba(230,204,141,.18); background:linear-gradient(90deg,rgba(202,166,93,.025),transparent); animation:route-manifest-open 540ms var(--ease-out) both; }
+.route-compass__manifest h3 { margin:.55rem 0 1.4rem; font-family:var(--font-display),serif; font-size:clamp(2rem,4vw,3.4rem); line-height:.9; font-weight:500; }
+.route-compass__bearing { display:flex; justify-content:space-between; gap:1rem; align-items:center; padding:.65rem 0; border-top:1px solid rgba(230,204,141,.12); border-bottom:1px solid rgba(230,204,141,.12); }
+.route-compass__bearing span,.route-compass__manifest dt { color:rgba(239,229,203,.45); font-size:.5rem; letter-spacing:.13em; text-transform:uppercase; }
+.route-compass__bearing strong { color:#dfc47d; font-family:var(--font-display),serif; font-size:1rem; }
+.route-compass__manifest dl { display:grid; grid-template-columns:repeat(3,1fr); gap:.8rem; margin:1.2rem 0 0; }
+.route-compass__manifest dl div { padding:.8rem 0; border-bottom:1px solid rgba(230,204,141,.08); }
+.route-compass__manifest dd { margin:.3rem 0 0; font-family:var(--font-display),serif; font-size:1.1rem; color:var(--ivory); }
+.route-compass__warning { margin:1.2rem 0 0; color:var(--ivory-muted); font-size:.7rem; line-height:1.6; }
+.route-compass--vael .route-compass__manifest { border-left-color:rgba(119,165,111,.3); background:linear-gradient(90deg,rgba(119,165,111,.045),transparent); }
+
+@keyframes compass-ring-spin { to { transform:rotate(360deg); } }
+@keyframes all-route-spin { to { transform:rotate(calc(var(--route-angle) + 360deg)); } }
+@keyframes compass-breathe { 50% { transform:scale(1.025); border-color:rgba(230,204,141,.28); } }
+@keyframes vael-route-echo { 50% { transform:scale(1.08); opacity:.28; filter:blur(.4px); } }
+@keyframes route-manifest-open { from { opacity:0; transform:translateX(.8rem); filter:blur(3px); } }
+
+@media (max-width:1080px) {
+  .route-compass { grid-template-columns:minmax(16rem,.85fr) 1fr; }
+  .route-compass__dial { width:min(42vw,24rem); grid-row:1 / span 2; }
+  .route-compass__manifest { border-left:0; border-top:1px solid rgba(230,204,141,.16); }
+}
+
+@media (max-width:760px) {
+  .route-compass { grid-template-columns:1fr; padding:1rem; }
+  .route-compass__dial { grid-row:auto; width:min(78vw,22rem); }
+  .route-compass__route-list button { grid-template-columns:2rem 1fr; }
+  .route-compass__route-list small { grid-column:2; }
+  .route-compass__manifest dl { grid-template-columns:1fr; gap:0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .route-compass__ring,.route-compass__ray,.route-compass__needle,.route-compass__echo,.route-compass__manifest { animation:none !important; transition-duration:1ms !important; }
+}
