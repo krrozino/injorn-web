@@ -6,6 +6,7 @@ import "./pages.css";
 import "./lore.css";
 import "./expanded-content.css";
 import "./audit-fixes.css";
+import "./injorn-identity.css";
 
 const display = Cormorant_Garamond({
   subsets: ["latin"],
