@@ -16,7 +16,7 @@ export function RoyalDecree() {
     <>
       <button
         type="button"
-        className="royal-decree-trigger"
+        className="royal-doctrine__seal royal-decree-trigger"
         aria-expanded={open}
         onClick={() => setOpen(true)}
       >
