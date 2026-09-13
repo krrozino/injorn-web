@@ -4,11 +4,11 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 
 const navigation = [
-  { label: "Mundo", href: "/#mundo" },
-  { label: "Personagens", href: "/#personagens" },
-  { label: "Crônicas", href: "/#cronicas" },
-  { label: "Arquivo", href: "/#arquivo" },
-  { label: "Ecos", href: "/#ecos" },
+  { label: "Mundo", href: "/mundo" },
+  { label: "Personagens", href: "/personagens" },
+  { label: "Crônicas", href: "/cronicas" },
+  { label: "Arquivo", href: "/arquivo" },
+  { label: "Ecos", href: "/ecos" },
 ];
 
 export function SiteHeader() {
