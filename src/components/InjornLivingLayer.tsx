@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
+import { InjornDiscoveryLayer } from "@/components/InjornDiscoveryLayer";
 
 function dispatchFor(pathname: string) {
   if (pathname.startsWith("/arquivo")) return "ARQUIVO CIVIL · ACESSO REGISTRADO";
@@ -75,50 +76,44 @@ export function InjornLivingLayer() {
   }, [pathname]);
 
   return (
-    <div className="injorn-living-layer">
-      <button
-        type="button"
-        className={`dissonance-toggle ${lens ? "dissonance-toggle--active" : ""}`}
-        aria-pressed={lens}
-        onClick={() => setLens((value) => !value)}
-      >
-        <span className="dissonance-toggle__sigil" aria-hidden="true">
-          <i /><i /><i /><i /><i /><i /><i />
-        </span>
-        <span>
-          <small>Lente da Dissonância</small>
-          <strong>{lens ? "Leitura de procedência ativa" : "Inspecionar procedência"}</strong>
-        </span>
-      </button>
+    <>
+      <div className="injorn-living-layer">
+        <button
+          type="button"
+          className={`dissonance-toggle ${lens ? "dissonance-toggle--active" : ""}`}
+          aria-pressed={lens}
+          onClick={() => setLens((value) => !value)}
+        >
+          <span className="dissonance-toggle__sigil" aria-hidden="true"><i /><i /><i /><i /><i /><i /><i /></span>
+          <span>
+            <small>Lente da Dissonância</small>
+            <strong>{lens ? "Leitura de procedência ativa" : "Inspecionar procedência"}</strong>
+          </span>
+        </button>
 
-      <div className={`dissonance-lens ${lens ? "dissonance-lens--active" : ""}`} aria-hidden="true">
-        <div className="dissonance-lens__scan" />
-        <div className="dissonance-lens__legend">
-          <span><i className="is-official" />Fonte estatal</span>
-          <span><i className="is-observed" />Observado</span>
-          <span><i className="is-discovered" />Descoberto</span>
-          <span><i className="is-rumor" />Rumor</span>
+        <div className={`dissonance-lens ${lens ? "dissonance-lens--active" : ""}`} aria-hidden="true">
+          <div className="dissonance-lens__scan" />
+          <div className="dissonance-lens__legend">
+            <span><i className="is-official" />Fonte estatal</span>
+            <span><i className="is-observed" />Observado</span>
+            <span><i className="is-discovered" />Descoberto</span>
+            <span><i className="is-rumor" />Rumor</span>
+          </div>
+        </div>
+
+        <aside className={`royal-dispatch ${dispatchVisible ? "royal-dispatch--show" : ""}`} aria-hidden={!dispatchVisible}>
+          <span className="royal-dispatch__seal" aria-hidden="true">VII</span>
+          <div><small>COMUNICADO DO REINO</small><strong>{dispatchFor(pathname)}</strong></div>
+          <i aria-hidden="true" />
+        </aside>
+
+        <div className={`vael-anomaly ${anomalyVisible ? "vael-anomaly--show" : ""}`} aria-hidden="true">
+          <span className="vael-anomaly__edge vael-anomaly__edge--top" />
+          <span className="vael-anomaly__edge vael-anomaly__edge--bottom" />
+          <div className="vael-anomaly__signal"><small>SINAL FORA DO ARQUIVO</small><strong>VAEL KARUN</strong><span>memória residual detectada</span></div>
         </div>
       </div>
-
-      <aside className={`royal-dispatch ${dispatchVisible ? "royal-dispatch--show" : ""}`} aria-hidden={!dispatchVisible}>
-        <span className="royal-dispatch__seal" aria-hidden="true">VII</span>
-        <div>
-          <small>COMUNICADO DO REINO</small>
-          <strong>{dispatchFor(pathname)}</strong>
-        </div>
-        <i aria-hidden="true" />
-      </aside>
-
-      <div className={`vael-anomaly ${anomalyVisible ? "vael-anomaly--show" : ""}`} aria-hidden="true">
-        <span className="vael-anomaly__edge vael-anomaly__edge--top" />
-        <span className="vael-anomaly__edge vael-anomaly__edge--bottom" />
-        <div className="vael-anomaly__signal">
-          <small>SINAL FORA DO ARQUIVO</small>
-          <strong>VAEL KARUN</strong>
-          <span>memória residual detectada</span>
-        </div>
-      </div>
-    </div>
+      <InjornDiscoveryLayer />
+    </>
   );
 }
