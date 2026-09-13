@@ -1,5 +1,6 @@
 "use client";
 
+import type { CSSProperties } from "react";
 import { useEffect, useState } from "react";
 
 type ArchiveEntry = {
@@ -41,7 +42,7 @@ export function ArchiveRituals({ entries }: ArchiveRitualsProps) {
             className="archive-ritual-card"
             key={entry.code}
             onClick={() => setActive(entry)}
-            style={{ "--archive-delay": `${index * 45}ms` } as React.CSSProperties}
+            style={{ "--archive-delay": `${index * 45}ms` } as CSSProperties}
           >
             <span className="archive-ritual-card__code">{entry.code}</span>
             <span className="archive-ritual-card__seal" aria-hidden="true"><i /></span>
