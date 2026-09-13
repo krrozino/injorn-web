@@ -7,6 +7,7 @@ import "./lore.css";
 import "./expanded-content.css";
 import "./audit-fixes.css";
 import "./injorn-identity.css";
+import "./home-v2.css";
 
 const display = Cormorant_Garamond({
   subsets: ["latin"],
