@@ -1,0 +1,68 @@
+name: Visual Audit
+
+on:
+  push:
+    branches:
+      - feat/foundation-v1
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  screenshots:
+    name: Capture desktop and mobile pages
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install app dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Install Playwright
+        run: |
+          npm install --no-save playwright@latest
+          npx playwright install --with-deps chromium
+
+      - name: Build
+        run: npm run build
+
+      - name: Start app
+        run: |
+          npm run start > /tmp/injorn-next.log 2>&1 &
+          echo $! > /tmp/injorn-next.pid
+          for i in {1..30}; do
+            if curl -fsS http://127.0.0.1:3000 >/dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/injorn-next.log
+          exit 1
+
+      - name: Capture screenshots
+        run: |
+          mkdir -p visual-audit/desktop visual-audit/mobile
+          pages=("" "mundo" "personagens" "faccoes" "bestiario" "cronicas" "arquivo" "ecos")
+          for page in "${pages[@]}"; do
+            name="${page:-home}"
+            npx playwright screenshot --browser=chromium --full-page --viewport-size="1440,1000" "http://127.0.0.1:3000/${page}" "visual-audit/desktop/${name}.png"
+            npx playwright screenshot --browser=chromium --full-page --device="iPhone 13" "http://127.0.0.1:3000/${page}" "visual-audit/mobile/${name}.png"
+          done
+
+      - name: Upload screenshots
+        uses: actions/upload-artifact@v4
+        with:
+          name: injorn-visual-audit
+          path: visual-audit
+          if-no-files-found: error
+          retention-days: 7
