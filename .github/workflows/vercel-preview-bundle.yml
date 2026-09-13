@@ -45,7 +45,7 @@ jobs:
         run: |
           python - <<'PY'
           from pathlib import Path
-          import json, re, html as htmlmod
+          import json, re
 
           out = Path('out')
           routes = ['', 'mundo', 'personagens', 'faccoes', 'bestiario', 'cronicas', 'arquivo', 'ecos']
@@ -55,7 +55,15 @@ jobs:
             '/arquivo': 'Arquivo — Injorn', '/ecos': 'Ecos — Injorn'
           }
 
-          css = ''.join(p.read_text() for p in sorted((out / '_next' / 'static' / 'css').glob('*.css')))
+          style_files = [
+            'src/app/globals.css',
+            'src/app/interaction.css',
+            'src/app/pages.css',
+            'src/app/lore.css',
+            'src/app/expanded-content.css',
+            'src/app/audit-fixes.css',
+          ]
+          css = ''.join(Path(p).read_text() for p in style_files)
           css += ':root{--font-display:Georgia,"Times New Roman",serif;--font-sans:Arial,Helvetica,sans-serif}'
 
           mains = {}
@@ -71,7 +79,6 @@ jobs:
             mains['/' + route if route else '/'] = m.group(1)
 
           assert root_html is not None
-          # Strip Next runtime/scripts and external CSS/font preloads. We replace them with inline CSS + tiny navigation runtime.
           root_html = re.sub(r'<script\b[^>]*>.*?</script>', '', root_html, flags=re.S)
           root_html = re.sub(r'<link\b[^>]*(?:rel="stylesheet"|as="font")[^>]*>', '', root_html, flags=re.I)
           root_html = re.sub(r'<link\b[^>]*rel="preload"[^>]*>', '', root_html, flags=re.I)
@@ -92,7 +99,6 @@ jobs:
           runtime = runtime.replace('__PAGES__', json.dumps(mains, ensure_ascii=False)).replace('__TITLES__', json.dumps(titles, ensure_ascii=False))
           root_html = root_html.replace('</head>', f'<style>{css}</style></head>')
           root_html = root_html.replace('</body>', runtime + '</body>')
-          # Remove needless whitespace between tags while preserving text nodes.
           root_html = re.sub(r'>\s+<', '><', root_html)
           Path('preview.html').write_text(root_html)
           Path('vercel.json').write_text(json.dumps({'rewrites':[{'source':'/(.*)','destination':'/index.html'}]}))
