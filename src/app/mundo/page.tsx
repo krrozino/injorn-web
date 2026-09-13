@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { KnowledgeStatus } from "@/components/KnowledgeStatus";
 import { PublicPage } from "@/components/PublicPage";
 import { knownPlaces, officialTimeline, spoilerBoundary } from "@/content/playerKnowledge";
+import { knownTravelDistances } from "@/content/travel";
 
 export const metadata: Metadata = {
   title: "Mundo",
@@ -65,6 +66,38 @@ export default function MundoPage() {
                 ))}
               </ul>
             </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="lore-section" aria-labelledby="travel-title">
+        <header className="lore-section__heading">
+          <div>
+            <p className="kicker">Estradas conhecidas</p>
+            <h2 id="travel-title">Distâncias a partir da capital</h2>
+          </div>
+          <p className="lore-section__aside">
+            Tempos aproximados usados pelos viajantes do reino. Terreno, clima, patrulhas e incidentes
+            podem alterar qualquer percurso.
+          </p>
+        </header>
+
+        <div className="travel-table" role="table" aria-label="Distâncias conhecidas de Injorn">
+          <div className="travel-table__row travel-table__row--head" role="row">
+            <span role="columnheader">Destino</span>
+            <span role="columnheader">Direção</span>
+            <span role="columnheader">A cavalo</span>
+            <span role="columnheader">A pé</span>
+            <span role="columnheader">Distância</span>
+          </div>
+          {knownTravelDistances.map((route) => (
+            <div className="travel-table__row" role="row" key={route.destination}>
+              <strong role="cell">{route.destination}</strong>
+              <span role="cell">{route.direction}</span>
+              <span role="cell">{route.horseback}</span>
+              <span role="cell">{route.onFoot}</span>
+              <span role="cell">{route.distance}</span>
+            </div>
           ))}
         </div>
       </section>
