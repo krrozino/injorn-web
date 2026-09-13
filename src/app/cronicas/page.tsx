@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { KnowledgeStatus } from "@/components/KnowledgeStatus";
+import { MemorySpindle } from "@/components/MemorySpindle";
 import { PublicPage } from "@/components/PublicPage";
 import { campaignChronicles, spoilerBoundary } from "@/content/playerKnowledge";
 
@@ -20,6 +21,19 @@ export default function CronicasPage() {
           Planos de sessões futuras não aparecem aqui. Quando uma sessão é jogada, o que realmente
           aconteceu substitui o planejamento do mestre.
         </p>
+      </section>
+
+      <section className="lore-section" aria-labelledby="spindle-title">
+        <header className="lore-section__heading">
+          <div>
+            <p className="kicker">Instrumento de memória</p>
+            <h2 id="spindle-title">Fuso das lembranças</h2>
+          </div>
+          <p className="lore-section__aside">
+            Escolha uma chama. O instrumento recompõe aquela memória sem ultrapassar a última sessão pública.
+          </p>
+        </header>
+        <MemorySpindle chapters={campaignChronicles} />
       </section>
 
       <section className="lore-section" aria-labelledby="chronicles-title">
