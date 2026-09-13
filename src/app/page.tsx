@@ -4,6 +4,7 @@ import { SiteHeader } from "@/components/SiteHeader";
 const portals = [
   {
     id: "mundo",
+    href: "/mundo",
     index: "I",
     eyebrow: "Atlas",
     title: "O Mundo",
@@ -12,6 +13,7 @@ const portals = [
   },
   {
     id: "personagens",
+    href: "/personagens",
     index: "II",
     eyebrow: "Nomes",
     title: "Personagens",
@@ -20,6 +22,7 @@ const portals = [
   },
   {
     id: "cronicas",
+    href: "/cronicas",
     index: "III",
     eyebrow: "Memória",
     title: "Crônicas",
@@ -28,6 +31,7 @@ const portals = [
   },
   {
     id: "arquivo",
+    href: "/arquivo",
     index: "IV",
     eyebrow: "Documentos",
     title: "Arquivo",
@@ -57,11 +61,11 @@ export default function Home() {
         </p>
 
         <div className="hero__actions">
-          <Link className="primary-link" href="#mundo">
+          <Link className="primary-link" href="/mundo">
             <span>Entrar em Injorn</span>
-            <span aria-hidden="true">↓</span>
+            <span aria-hidden="true">↗</span>
           </Link>
-          <Link className="text-link" href="#cronicas">
+          <Link className="text-link" href="/cronicas">
             Ler as crônicas
           </Link>
         </div>
@@ -99,7 +103,7 @@ export default function Home() {
 
         <div className="portal-grid">
           {portals.map((portal) => (
-            <article className="portal-card" id={portal.id} key={portal.id}>
+            <Link className="portal-card" id={portal.id} key={portal.id} href={portal.href}>
               <div className="portal-card__topline">
                 <span>{portal.index}</span>
                 <span>{portal.eyebrow}</span>
@@ -112,7 +116,7 @@ export default function Home() {
                 {portal.action}
                 <span aria-hidden="true">↗</span>
               </span>
-            </article>
+            </Link>
           ))}
         </div>
       </section>
@@ -130,7 +134,7 @@ export default function Home() {
             O site registra apenas o que já pode ser visto pelos jogadores. Bastidores, segredos e
             planejamento continuam fora daqui.
           </p>
-          <Link className="text-link text-link--large" href="#cronicas">
+          <Link className="text-link text-link--large" href="/cronicas">
             Ver estrutura das crônicas
           </Link>
         </div>
@@ -149,7 +153,9 @@ export default function Home() {
             <strong>Trilhas e leitmotivs</strong>
             <span>Estrutura pronta para receber as músicas oficiais.</span>
           </div>
-          <span className="echoes__duration">—:—</span>
+          <Link className="echoes__duration" href="/ecos" aria-label="Abrir Ecos de Injorn">
+            ↗
+          </Link>
         </div>
       </section>
 
