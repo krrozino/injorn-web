@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { KnowledgeStatus } from "@/components/KnowledgeStatus";
 import { PublicPage } from "@/components/PublicPage";
+import { currentParty } from "@/content/party";
 import { publicFigures, spoilerBoundary } from "@/content/playerKnowledge";
 
 export const metadata: Metadata = {
@@ -15,14 +16,40 @@ export default function PersonagensPage() {
     <PublicPage
       eyebrow="Nomes de Injorn"
       title="Personagens"
-      intro="Figuras políticas, religiosas e pessoas encontradas ao longo da campanha, sempre limitadas ao que já pode ser conhecido pelos jogadores."
+      intro="Aventureiros, figuras políticas, religiosas e pessoas encontradas ao longo da campanha, sempre limitados ao que pode ser compartilhado entre os jogadores."
     >
       <section className="knowledge-boundary" aria-label="Limite de conhecimento">
         <span>{spoilerBoundary.label}</span>
         <p>
-          Retratos interativos serão adicionados quando suas artes canônicas estiverem fechadas. O
-          conteúdo textual já respeita a mesma fronteira de spoilers.
+          Retratos interativos serão adicionados quando suas artes canônicas estiverem fechadas. Segredos
+          individuais de personagens jogadores não entram no site só porque existem nas páginas privadas do Notion.
         </p>
+      </section>
+
+      <section className="lore-section" aria-labelledby="party-title">
+        <header className="lore-section__heading">
+          <div>
+            <p className="kicker">O grupo</p>
+            <h2 id="party-title">Aventureiros do Ato II</h2>
+          </div>
+          <p className="lore-section__aside">
+            Dossiês deliberadamente públicos. Memórias apagadas, revelações futuras e segredos pessoais
+            permanecem onde pertencem: na mesa e nas anotações privadas.
+          </p>
+        </header>
+
+        <div className="party-grid">
+          {currentParty.map((member, index) => (
+            <article className="party-card" key={member.name}>
+              <div className="party-card__index">{String(index + 1).padStart(2, "0")}</div>
+              <div>
+                <span className="party-card__descriptor">{member.descriptor}</span>
+                <h3>{member.name}</h3>
+                <p>{member.summary}</p>
+              </div>
+            </article>
+          ))}
+        </div>
       </section>
 
       <section className="lore-section" aria-labelledby="official-figures-title">
