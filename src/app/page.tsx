@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { RoyalDecree } from "@/components/RoyalDecree";
 import { SiteHeader } from "@/components/SiteHeader";
 
 const portals = [
@@ -145,19 +146,7 @@ export default function Home() {
       </section>
 
       <section className="royal-doctrine section-shell" aria-labelledby="doctrine-title">
-        <div className="royal-doctrine__seal" aria-hidden="true">
-          <div className="royal-doctrine__sun">
-            <i />
-            <i />
-            <i />
-            <i />
-            <i />
-            <i />
-            <i />
-            <strong>I</strong>
-          </div>
-          <span>REGISTRO DA COROA</span>
-        </div>
+        <RoyalDecree />
         <div className="royal-doctrine__content">
           <p className="kicker">A face oficial do reino</p>
           <h2 id="doctrine-title">Injorn possui uma versão de si mesmo.</h2>
