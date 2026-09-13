@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { FactionTable } from "@/components/FactionTable";
 import { KnowledgeStatus } from "@/components/KnowledgeStatus";
 import { PublicPage } from "@/components/PublicPage";
 import { factions } from "@/content/factions";
@@ -23,11 +24,24 @@ export default function FaccoesPage() {
         </p>
       </section>
 
+      <section className="lore-section" aria-labelledby="power-table-title">
+        <header className="lore-section__heading">
+          <div>
+            <p className="kicker">Leitura política</p>
+            <h2 id="power-table-title">Mesa das forças conhecidas</h2>
+          </div>
+          <p className="lore-section__aside">
+            Gire a mesa e selecione um estandarte. O círculo organiza consulta, não alianças ocultas.
+          </p>
+        </header>
+        <FactionTable factions={factions} />
+      </section>
+
       <section className="lore-section" aria-labelledby="factions-title">
         <header className="lore-section__heading">
           <div>
             <p className="kicker">Forças em movimento</p>
-            <h2 id="factions-title">Mesa dos estandartes</h2>
+            <h2 id="factions-title">Arquivo dos estandartes</h2>
           </div>
           <p className="lore-section__aside">
             Cada força ocupa seu próprio espaço visual. Abra um estandarte para ver somente o que já chegou aos jogadores.
