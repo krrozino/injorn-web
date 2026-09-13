@@ -3,6 +3,7 @@ import { Cormorant_Garamond, Manrope } from "next/font/google";
 import { InjornAmbientEffects } from "@/components/InjornAmbientEffects";
 import { InjornLivingLayer } from "@/components/InjornLivingLayer";
 import { InjornRouteTransition } from "@/components/InjornRouteTransition";
+import { SevenGatesMenu } from "@/components/SevenGatesMenu";
 import "./globals.css";
 import "./interaction.css";
 import "./pages.css";
@@ -16,6 +17,8 @@ import "./ritual-interactions.css";
 import "./origin-burst.css";
 import "./migarazur-seal-fix.css";
 import "./living-layer.css";
+import "./seven-gates.css";
+import "./route-compass.css";
 
 const display = Cormorant_Garamond({
   subsets: ["latin"],
@@ -46,6 +49,7 @@ export default function RootLayout({
       <body>
         <InjornAmbientEffects />
         <InjornLivingLayer />
+        <SevenGatesMenu />
         <InjornRouteTransition />
         {children}
       </body>
