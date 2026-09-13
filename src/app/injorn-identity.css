@@ -1,0 +1,830 @@
+/*
+ * Injorn visual identity — image-independent layer.
+ *
+ * The current concept art is treated as a mood reference, not as a structural
+ * dependency. This file encodes the stable visual language of the setting:
+ * state heraldry, deep green cloth, aged gold, black iron, stone, propaganda,
+ * archival documents and the colder visual grammar of Vael Karun.
+ */
+
+:root {
+  --injorn-green-950: #050b08;
+  --injorn-green-900: #09150f;
+  --injorn-green-800: #10261b;
+  --injorn-green-700: #173726;
+  --injorn-gold-900: #5d4826;
+  --injorn-gold-700: #9f7d3f;
+  --injorn-gold-500: #caa65d;
+  --injorn-gold-300: #e6cc8d;
+  --injorn-iron: #151714;
+  --injorn-stone: #252821;
+  --injorn-obsidian: #050706;
+  --injorn-copper: #633f27;
+  --injorn-arcane: #77a56f;
+  --injorn-frost: #8f9daa;
+  --injorn-blood: #6c2b25;
+  --injorn-cloth: #17472f;
+  --injorn-thread: rgba(230, 204, 141, 0.16);
+  --injorn-engraving: rgba(230, 204, 141, 0.08);
+  --injorn-shadow: rgba(0, 0, 0, 0.72);
+}
+
+html {
+  background: var(--injorn-obsidian);
+}
+
+body {
+  background:
+    radial-gradient(circle at 50% -12rem, rgba(202, 166, 93, 0.13), transparent 36rem),
+    radial-gradient(circle at 15% 34%, rgba(23, 71, 47, 0.16), transparent 34rem),
+    linear-gradient(180deg, #0a100c 0%, #070a08 48%, #040605 100%);
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  pointer-events: none;
+  opacity: 0.23;
+  mix-blend-mode: soft-light;
+  background:
+    repeating-linear-gradient(0deg, transparent 0 3px, rgba(255, 255, 255, 0.014) 3px 4px),
+    repeating-linear-gradient(90deg, transparent 0 5px, rgba(202, 166, 93, 0.012) 5px 6px);
+}
+
+/* ---------- Royal navigation ---------- */
+
+.site-header {
+  border-bottom-color: rgba(202, 166, 93, 0.13);
+  background:
+    linear-gradient(90deg, transparent, rgba(202, 166, 93, 0.045) 50%, transparent),
+    linear-gradient(180deg, rgba(4, 7, 5, 0.96), rgba(6, 10, 7, 0.82) 72%, rgba(6, 10, 7, 0.1));
+}
+
+.site-header::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -1px;
+  width: min(38vw, 30rem);
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--injorn-gold-500), transparent);
+  transform: translateX(-50%);
+  opacity: 0.72;
+}
+
+.site-brand__mark,
+.site-footer__mark {
+  position: relative;
+  border-color: rgba(230, 204, 141, 0.42);
+  background:
+    radial-gradient(circle, rgba(202, 166, 93, 0.16), transparent 62%),
+    rgba(9, 21, 15, 0.65);
+  box-shadow: 0 0 0 3px rgba(202, 166, 93, 0.035);
+}
+
+.site-brand__mark::before,
+.site-footer__mark::before {
+  content: "";
+  position: absolute;
+  inset: -0.42rem;
+  border: 1px solid rgba(202, 166, 93, 0.12);
+}
+
+.desktop-nav a {
+  text-transform: uppercase;
+  letter-spacing: 0.13em;
+}
+
+/* ---------- Home: the official face of Injorn ---------- */
+
+.hero {
+  background:
+    linear-gradient(90deg, rgba(5, 11, 8, 0.9), transparent 20%, transparent 80%, rgba(5, 11, 8, 0.9)),
+    radial-gradient(circle at 50% 43%, rgba(23, 71, 47, 0.16), transparent 24rem);
+}
+
+.hero::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: var(--header-h) clamp(1rem, 5vw, 5rem) 2rem;
+  border-inline: 1px solid rgba(202, 166, 93, 0.08);
+  background:
+    linear-gradient(90deg, transparent 49.85%, rgba(230, 204, 141, 0.065) 49.95% 50.05%, transparent 50.15%),
+    linear-gradient(180deg, transparent 78%, rgba(202, 166, 93, 0.045));
+  pointer-events: none;
+}
+
+.hero__ambient {
+  width: min(76vw, 64rem);
+  opacity: 0.86;
+}
+
+.hero__ambient::before {
+  content: "";
+  position: absolute;
+  inset: -10%;
+  border-radius: 50%;
+  background: repeating-conic-gradient(
+    from 0deg,
+    rgba(230, 204, 141, 0.23) 0deg 1deg,
+    transparent 1deg 12deg
+  );
+  -webkit-mask: radial-gradient(circle, transparent 0 57%, #000 57.3% 58.2%, transparent 58.5% 100%);
+  mask: radial-gradient(circle, transparent 0 57%, #000 57.3% 58.2%, transparent 58.5% 100%);
+  opacity: 0.68;
+}
+
+.hero__ambient::after {
+  content: "";
+  position: absolute;
+  top: 7%;
+  bottom: 7%;
+  left: 50%;
+  width: 2px;
+  background: linear-gradient(
+    transparent,
+    rgba(230, 204, 141, 0.08) 13%,
+    rgba(230, 204, 141, 0.74) 48%,
+    rgba(230, 204, 141, 0.08) 87%,
+    transparent
+  );
+  box-shadow: 0 0 1.8rem rgba(202, 166, 93, 0.25);
+  transform: translateX(-50%);
+}
+
+.hero__ring--outer {
+  border-color: rgba(202, 166, 93, 0.35);
+  box-shadow:
+    inset 0 0 3rem rgba(202, 166, 93, 0.025),
+    0 0 4rem rgba(23, 71, 47, 0.08);
+}
+
+.hero__ring--inner {
+  border-color: rgba(230, 204, 141, 0.11);
+}
+
+.hero__diamond {
+  width: 31%;
+  border-color: rgba(202, 166, 93, 0.14);
+  box-shadow: 0 0 0 1.4rem rgba(202, 166, 93, 0.012);
+}
+
+.hero h1 {
+  position: relative;
+  color: transparent;
+  background: linear-gradient(180deg, #f0deb0 0%, #d3b671 38%, #a47e3e 82%, #76572d 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  filter: drop-shadow(0 0.65rem 1.6rem rgba(0, 0, 0, 0.5));
+  text-shadow: none;
+}
+
+.hero h1::after {
+  content: "";
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  bottom: -0.32em;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(230, 204, 141, 0.46), transparent);
+}
+
+.hero__statement {
+  color: rgba(239, 229, 203, 0.83);
+  text-shadow: 0 2px 1.3rem rgba(0, 0, 0, 0.68);
+}
+
+.primary-link {
+  position: relative;
+  overflow: hidden;
+  clip-path: polygon(0.55rem 0, calc(100% - 0.55rem) 0, 100% 0.55rem, 100% calc(100% - 0.55rem), calc(100% - 0.55rem) 100%, 0.55rem 100%, 0 calc(100% - 0.55rem), 0 0.55rem);
+  border-color: rgba(202, 166, 93, 0.5);
+  background:
+    linear-gradient(180deg, rgba(23, 71, 47, 0.5), rgba(9, 21, 15, 0.75)),
+    rgba(202, 166, 93, 0.045);
+}
+
+.primary-link::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(110deg, transparent 20%, rgba(255, 238, 188, 0.14) 47%, transparent 63%);
+  transform: translateX(-120%);
+  transition: transform 620ms var(--ease-out);
+}
+
+.primary-link:hover::before,
+.primary-link:focus-visible::before {
+  transform: translateX(120%);
+}
+
+.manifesto {
+  isolation: isolate;
+}
+
+.manifesto::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  top: 12%;
+  right: 0;
+  width: min(48vw, 38rem);
+  height: 76%;
+  background:
+    linear-gradient(90deg, transparent, rgba(23, 71, 47, 0.12)),
+    repeating-linear-gradient(0deg, transparent 0 2.65rem, rgba(230, 204, 141, 0.032) 2.65rem 2.7rem);
+  border-right: 1px solid rgba(202, 166, 93, 0.12);
+  pointer-events: none;
+}
+
+.section-number {
+  color: rgba(202, 166, 93, 0.42);
+  text-shadow: 0 0 2rem rgba(202, 166, 93, 0.08);
+}
+
+/* ---------- Six doors, six visual grammars ---------- */
+
+.portal-card {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  background:
+    linear-gradient(145deg, rgba(23, 71, 47, 0.07), transparent 44%),
+    rgba(255, 255, 255, 0.005);
+}
+
+.portal-card::before,
+.portal-card::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  pointer-events: none;
+  transition:
+    opacity 420ms ease,
+    transform 620ms var(--ease-out),
+    filter 420ms ease;
+}
+
+/* Atlas: survey lines and a restrained cartographic circle. */
+#mund o {}
+
+#mundo::before {
+  inset: 0;
+  background:
+    linear-gradient(rgba(230, 204, 141, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(230, 204, 141, 0.045) 1px, transparent 1px);
+  background-size: 2.7rem 2.7rem;
+  -webkit-mask: linear-gradient(135deg, #000, transparent 72%);
+  mask: linear-gradient(135deg, #000, transparent 72%);
+  opacity: 0.45;
+}
+
+#mundo::after {
+  width: 15rem;
+  aspect-ratio: 1;
+  right: -5rem;
+  bottom: -5rem;
+  border: 1px solid rgba(230, 204, 141, 0.19);
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 1.8rem rgba(202, 166, 93, 0.025),
+    0 0 0 3.6rem rgba(202, 166, 93, 0.018);
+}
+
+#mundo:hover::after {
+  transform: rotate(14deg) scale(1.08);
+}
+
+/* Characters: the silhouette of a state portrait / cathedral arch. */
+#personagens::before {
+  top: 2.8rem;
+  right: 2.6rem;
+  width: min(36%, 12rem);
+  height: 68%;
+  border: 1px solid rgba(230, 204, 141, 0.13);
+  border-radius: 50% 50% 0 0 / 28% 28% 0 0;
+  box-shadow:
+    inset 0 0 0 0.55rem rgba(202, 166, 93, 0.018),
+    0 0 2rem rgba(0, 0, 0, 0.22);
+  opacity: 0.65;
+}
+
+#personagens::after {
+  top: 3.8rem;
+  right: calc(2.6rem + min(18%, 6rem));
+  width: 1px;
+  height: 58%;
+  background: linear-gradient(transparent, rgba(230, 204, 141, 0.24), transparent);
+}
+
+#personagens:hover::before {
+  transform: translateY(-0.4rem);
+  border-color: rgba(230, 204, 141, 0.27);
+}
+
+/* Factions: a hanging standard. */
+#faccoes::before {
+  top: 0;
+  right: 2.2rem;
+  width: 6.2rem;
+  height: 13rem;
+  transform-origin: 50% 0;
+  clip-path: polygon(0 0, 100% 0, 100% 82%, 50% 100%, 0 82%);
+  background:
+    linear-gradient(90deg, rgba(230, 204, 141, 0.08), transparent 23% 77%, rgba(230, 204, 141, 0.06)),
+    linear-gradient(180deg, rgba(23, 71, 47, 0.5), rgba(9, 21, 15, 0.16));
+  border-inline: 1px solid rgba(202, 166, 93, 0.13);
+  opacity: 0.62;
+}
+
+#faccoes::after {
+  top: 2.15rem;
+  right: 4.6rem;
+  width: 1.4rem;
+  aspect-ratio: 1;
+  border: 1px solid rgba(230, 204, 141, 0.33);
+  transform: rotate(45deg);
+}
+
+#faccoes:hover::before {
+  transform: rotate(1.5deg);
+  filter: brightness(1.18);
+}
+
+/* Bestiary: field scars, alchemical contamination and observation marks. */
+#bestiario::before {
+  inset: 0;
+  background:
+    radial-gradient(circle at 82% 30%, rgba(119, 165, 111, 0.14), transparent 11rem),
+    linear-gradient(118deg, transparent 67%, rgba(239, 229, 203, 0.08) 67.2% 67.6%, transparent 67.8%),
+    linear-gradient(113deg, transparent 72%, rgba(239, 229, 203, 0.07) 72.2% 72.55%, transparent 72.75%),
+    linear-gradient(108deg, transparent 77%, rgba(239, 229, 203, 0.06) 77.2% 77.5%, transparent 77.7%);
+  opacity: 0.58;
+}
+
+#bestiario::after {
+  right: 2.2rem;
+  bottom: 2rem;
+  width: 4.7rem;
+  aspect-ratio: 1;
+  border: 1px dashed rgba(119, 165, 111, 0.28);
+  border-radius: 50%;
+}
+
+#bestiario:hover::after {
+  transform: rotate(38deg) scale(1.06);
+}
+
+/* Chronicles: manuscript ruling and an illuminated margin. */
+#cronicas::before {
+  inset: 0;
+  background:
+    linear-gradient(90deg, rgba(202, 166, 93, 0.08) 1px, transparent 1px) 2rem 0 / 100% 100% no-repeat,
+    repeating-linear-gradient(0deg, transparent 0 2.35rem, rgba(230, 204, 141, 0.032) 2.35rem 2.4rem);
+  opacity: 0.58;
+}
+
+#cronicas::after {
+  left: 1.55rem;
+  top: 18%;
+  width: 1px;
+  height: 64%;
+  background: linear-gradient(transparent, rgba(202, 166, 93, 0.6), transparent);
+  box-shadow: 0 0 1rem rgba(202, 166, 93, 0.18);
+}
+
+#cronicas:hover::after {
+  transform: scaleY(1.13);
+}
+
+/* Archive: an embossed state seal. */
+#arquivo::before {
+  right: 2.7rem;
+  bottom: 2.6rem;
+  width: 7rem;
+  aspect-ratio: 1;
+  border: 1px solid rgba(202, 166, 93, 0.2);
+  border-radius: 50%;
+  box-shadow:
+    inset 0 0 0 0.55rem rgba(202, 166, 93, 0.018),
+    inset 0 0 0 0.65rem rgba(202, 166, 93, 0.1),
+    0 0 2rem rgba(0, 0, 0, 0.2);
+  opacity: 0.58;
+}
+
+#arquivo::after {
+  content: "ARQ";
+  right: 4.2rem;
+  bottom: 5.65rem;
+  color: rgba(230, 204, 141, 0.33);
+  font-family: var(--font-display), serif;
+  font-size: 0.82rem;
+  letter-spacing: 0.22em;
+  transform: rotate(-10deg);
+}
+
+#arquivo:hover::before {
+  transform: rotate(-7deg) scale(1.05);
+  border-color: rgba(230, 204, 141, 0.36);
+}
+
+.portal-card:hover {
+  background:
+    linear-gradient(145deg, rgba(23, 71, 47, 0.14), transparent 50%),
+    rgba(255, 255, 255, 0.014);
+}
+
+.portal-card__topline span:first-child {
+  display: grid;
+  place-items: center;
+  width: 1.8rem;
+  aspect-ratio: 1;
+  border: 1px solid rgba(202, 166, 93, 0.22);
+  transform: rotate(45deg);
+  font-family: var(--font-display), serif;
+  font-size: 0.72rem;
+  letter-spacing: 0;
+}
+
+.portal-card__body,
+.portal-card__action,
+.portal-card__topline {
+  position: relative;
+  z-index: 1;
+}
+
+/* ---------- Chronicles: memory is colder than propaganda ---------- */
+
+.chronicle-feature {
+  isolation: isolate;
+  background:
+    linear-gradient(90deg, rgba(5, 7, 6, 0.88), rgba(11, 19, 15, 0.36), rgba(5, 7, 6, 0.88)),
+    radial-gradient(circle at 27% 50%, rgba(143, 157, 170, 0.08), transparent 25rem);
+}
+
+.chronicle-feature::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  background:
+    linear-gradient(125deg, transparent 0 48%, rgba(143, 157, 170, 0.035) 48.2% 48.45%, transparent 48.65%),
+    linear-gradient(55deg, transparent 0 52%, rgba(202, 166, 93, 0.028) 52.2% 52.45%, transparent 52.65%);
+  pointer-events: none;
+}
+
+.chronicle-feature__ornament::before {
+  border-color: rgba(143, 157, 170, 0.28);
+}
+
+.chronicle-feature__ornament::after {
+  border-color: rgba(202, 166, 93, 0.11);
+}
+
+.chronicle-feature__ornament span:nth-child(1) {
+  background: radial-gradient(circle, rgba(143, 157, 170, 0.09), transparent 68%);
+}
+
+/* ---------- Public codex pages ---------- */
+
+.public-page {
+  --page-accent: var(--injorn-gold-500);
+  --page-accent-soft: rgba(202, 166, 93, 0.1);
+  --page-ambient: rgba(23, 71, 47, 0.14);
+  background:
+    radial-gradient(circle at 82% 13rem, var(--page-ambient), transparent 28rem),
+    linear-gradient(180deg, rgba(7, 12, 9, 0.6), rgba(5, 7, 6, 0.96));
+}
+
+.public-page__hero {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+
+.public-page__hero::before,
+.public-page__hero::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.public-page__hero::before {
+  top: 18%;
+  right: 0;
+  width: min(42vw, 34rem);
+  aspect-ratio: 1;
+  border: 1px solid color-mix(in srgb, var(--page-accent) 20%, transparent);
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 2rem color-mix(in srgb, var(--page-accent) 3%, transparent),
+    0 0 0 4rem color-mix(in srgb, var(--page-accent) 2%, transparent);
+  opacity: 0.7;
+}
+
+.public-page__hero::after {
+  top: 10%;
+  right: 11%;
+  width: 1px;
+  height: 72%;
+  background: linear-gradient(transparent, color-mix(in srgb, var(--page-accent) 52%, transparent), transparent);
+}
+
+.public-page__hero h1 {
+  position: relative;
+  text-shadow: 0 0 3rem var(--page-accent-soft);
+}
+
+.public-page__rule i {
+  border-color: var(--page-accent);
+  box-shadow: 0 0 0 0.4rem color-mix(in srgb, var(--page-accent) 3%, transparent);
+}
+
+.public-page__content > section {
+  position: relative;
+}
+
+.public-page .lore-card {
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.public-page .lore-card::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  background: linear-gradient(120deg, transparent 0 58%, var(--page-accent-soft) 100%);
+  opacity: 0;
+  transition: opacity 340ms ease;
+}
+
+.public-page .lore-card:hover::after {
+  opacity: 1;
+}
+
+/* World / Atlas — surveyor's table and official cartography. */
+.public-page--o-mundo {
+  --page-accent: #c8a75f;
+  --page-accent-soft: rgba(200, 167, 95, 0.09);
+  --page-ambient: rgba(23, 71, 47, 0.15);
+}
+
+.public-page--o-mundo .public-page__hero {
+  background:
+    linear-gradient(rgba(230, 204, 141, 0.034) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(230, 204, 141, 0.034) 1px, transparent 1px);
+  background-size: 3.2rem 3.2rem;
+}
+
+.public-page--o-mundo .travel-table {
+  box-shadow: inset 0 0 0 1px rgba(202, 166, 93, 0.05);
+}
+
+/* Characters — public portrait gallery / royal memorial architecture. */
+.public-page--personagens {
+  --page-accent: #d0b26b;
+  --page-accent-soft: rgba(208, 178, 107, 0.08);
+  --page-ambient: rgba(26, 63, 43, 0.18);
+}
+
+.public-page--personagens .public-page__hero::before {
+  border-radius: 50% 50% 0 0 / 34% 34% 0 0;
+  height: 28rem;
+  aspect-ratio: auto;
+  border-bottom: 0;
+}
+
+.public-page--personagens .lore-card {
+  border-top-color: rgba(208, 178, 107, 0.34);
+}
+
+/* Factions — banners, institutions, competing standards. */
+.public-page--faccoes {
+  --page-accent: #b68e4a;
+  --page-accent-soft: rgba(182, 142, 74, 0.09);
+  --page-ambient: rgba(41, 58, 41, 0.16);
+}
+
+.public-page--faccoes .public-page__hero::before {
+  border-radius: 0;
+  width: 10rem;
+  height: 25rem;
+  clip-path: polygon(0 0, 100% 0, 100% 84%, 50% 100%, 0 84%);
+  background: linear-gradient(180deg, rgba(23, 71, 47, 0.18), transparent);
+}
+
+/* Bestiary — field record contaminated by the unknown. */
+.public-page--bestiario {
+  --page-accent: #7fa776;
+  --page-accent-soft: rgba(127, 167, 118, 0.09);
+  --page-ambient: rgba(74, 112, 69, 0.12);
+}
+
+.public-page--bestiario .public-page__hero::before {
+  border-style: dashed;
+}
+
+.public-page--bestiario .lore-card {
+  background:
+    radial-gradient(circle at 100% 0%, rgba(119, 165, 111, 0.055), transparent 13rem),
+    rgba(255, 255, 255, 0.005);
+}
+
+/* Chronicles — chapter openings and remembered fragments. */
+.public-page--cronicas {
+  --page-accent: #9ca9b6;
+  --page-accent-soft: rgba(156, 169, 182, 0.08);
+  --page-ambient: rgba(94, 111, 126, 0.12);
+}
+
+.public-page--cronicas .public-page__hero {
+  background: repeating-linear-gradient(0deg, transparent 0 3rem, rgba(156, 169, 182, 0.025) 3rem 3.05rem);
+}
+
+/* Archive — pristine state paperwork meeting marked discoveries. */
+.public-page--arquivo {
+  --page-accent: #c7a159;
+  --page-accent-soft: rgba(199, 161, 89, 0.09);
+  --page-ambient: rgba(99, 63, 39, 0.09);
+}
+
+.public-page--arquivo .public-page__hero::before {
+  width: 16rem;
+  border-width: 2px;
+  box-shadow:
+    inset 0 0 0 0.8rem rgba(199, 161, 89, 0.015),
+    inset 0 0 0 0.9rem rgba(199, 161, 89, 0.08);
+  transform: rotate(-9deg);
+}
+
+/* Ecos — restrained resonance instead of a generic media-player aesthetic. */
+.public-page--ecos,
+.public-page--ecos-de-injorn {
+  --page-accent: #bda66d;
+  --page-accent-soft: rgba(189, 166, 109, 0.08);
+  --page-ambient: rgba(23, 71, 47, 0.12);
+}
+
+.public-page--ecos .public-page__hero::after,
+.public-page--ecos-de-injorn .public-page__hero::after {
+  width: 32%;
+  height: 1px;
+  top: 55%;
+  right: 4%;
+  background: repeating-linear-gradient(90deg, rgba(230, 204, 141, 0.5) 0 2px, transparent 2px 9px);
+}
+
+/* ---------- Footer: cloth-and-metal closure ---------- */
+
+.site-footer {
+  position: relative;
+  background:
+    linear-gradient(90deg, rgba(23, 71, 47, 0.1), transparent 35% 65%, rgba(23, 71, 47, 0.1)),
+    #040604;
+}
+
+.site-footer::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: min(72vw, 54rem);
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(230, 204, 141, 0.46), transparent);
+  transform: translateX(-50%);
+}
+
+/* ---------- Motion: meaning, not decoration ---------- */
+
+@media (prefers-reduced-motion: no-preference) {
+  .hero__ambient::before {
+    animation: injorn-solar-drift 90s linear infinite;
+  }
+
+  .hero__ambient::after {
+    animation: injorn-axis-breathe 5.4s ease-in-out infinite;
+  }
+
+  #faccoes:hover::before {
+    animation: injorn-standard-sway 2.8s ease-in-out infinite;
+  }
+
+  #bestiario:hover::after {
+    animation: injorn-field-mark 7s linear infinite;
+  }
+
+  @supports (animation-timeline: view()) {
+    .manifesto,
+    .portals,
+    .chronicle-feature,
+    .echoes,
+    .public-page__content > section {
+      animation: injorn-section-reveal linear both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 30%;
+    }
+  }
+}
+
+@keyframes injorn-solar-drift {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes injorn-axis-breathe {
+  0%,
+  100% {
+    opacity: 0.38;
+    filter: blur(0);
+  }
+  50% {
+    opacity: 0.92;
+    filter: blur(0.3px);
+  }
+}
+
+@keyframes injorn-standard-sway {
+  0%,
+  100% {
+    transform: rotate(1.5deg);
+  }
+  50% {
+    transform: rotate(-1.1deg);
+  }
+}
+
+@keyframes injorn-field-mark {
+  to {
+    transform: rotate(398deg) scale(1.06);
+  }
+}
+
+@keyframes injorn-section-reveal {
+  from {
+    opacity: 0.28;
+    transform: translateY(2.4rem);
+    filter: blur(2px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+
+/* ---------- Mobile ---------- */
+
+@media (max-width: 760px) {
+  .hero::after {
+    inset-inline: 0.75rem;
+  }
+
+  .hero__ambient {
+    width: min(112vw, 42rem);
+  }
+
+  .hero__ambient::before {
+    inset: -4%;
+  }
+
+  .manifesto::before {
+    width: 76vw;
+    opacity: 0.7;
+  }
+
+  .portal-card::before,
+  .portal-card::after {
+    opacity: 0.4;
+  }
+
+  #personagens::before {
+    right: 1.4rem;
+    width: 8rem;
+  }
+
+  #faccoes::before {
+    right: 1.4rem;
+    width: 4.8rem;
+    height: 10rem;
+  }
+
+  #faccoes::after {
+    right: 3.1rem;
+  }
+
+  .public-page__hero::before {
+    right: -7rem;
+    opacity: 0.45;
+  }
+
+  .public-page__hero::after {
+    right: 1.2rem;
+    opacity: 0.65;
+  }
+}
