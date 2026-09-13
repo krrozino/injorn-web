@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { PropagandaPoster } from "@/components/PropagandaPoster";
 import { RoyalDecree } from "@/components/RoyalDecree";
 import { SiteHeader } from "@/components/SiteHeader";
 
@@ -159,6 +160,17 @@ export default function Home() {
             Consultar registros e descobertas
           </Link>
         </div>
+      </section>
+
+      <section className="section-shell" aria-labelledby="propaganda-title">
+        <header className="section-heading">
+          <div>
+            <p className="kicker">Propaganda de Estado</p>
+            <h2 id="propaganda-title">Algumas verdades vêm impressas antes de serem questionadas.</h2>
+          </div>
+          <p>O cartaz existe como peça do mundo. Rasgue a superfície para trocar propaganda por procedência.</p>
+        </header>
+        <PropagandaPoster />
       </section>
 
       <section className="knowledge-codex section-shell" aria-labelledby="knowledge-title">
