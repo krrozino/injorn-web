@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { HeraldicGallery } from "@/components/HeraldicGallery";
 import { KnowledgeStatus } from "@/components/KnowledgeStatus";
 import { PublicPage } from "@/components/PublicPage";
 import { currentParty } from "@/content/party";
@@ -24,6 +25,19 @@ export default function PersonagensPage() {
           Retratos interativos serão adicionados quando suas artes canônicas estiverem fechadas. Segredos
           individuais de personagens jogadores não entram no site só porque existem nas páginas privadas do Notion.
         </p>
+      </section>
+
+      <section className="lore-section" aria-labelledby="gallery-title">
+        <header className="lore-section__heading">
+          <div>
+            <p className="kicker">Cerimonial público</p>
+            <h2 id="gallery-title">Salão das molduras</h2>
+          </div>
+          <p className="lore-section__aside">
+            As artes finais ainda podem mudar. Por enquanto, a moldura, o vitral e a procedência contam a história antes do retrato.
+          </p>
+        </header>
+        <HeraldicGallery figures={publicFigures} />
       </section>
 
       <section className="lore-section" aria-labelledby="party-title">
