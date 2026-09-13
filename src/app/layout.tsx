@@ -12,6 +12,7 @@ import "./injorn-identity.css";
 import "./home-v2.css";
 import "./route-transitions.css";
 import "./ritual-interactions.css";
+import "./origin-burst.css";
 
 const display = Cormorant_Garamond({
   subsets: ["latin"],
