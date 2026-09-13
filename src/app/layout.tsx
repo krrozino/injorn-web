@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Cormorant_Garamond, Manrope } from "next/font/google";
 import { InjornAmbientEffects } from "@/components/InjornAmbientEffects";
+import { InjornLivingLayer } from "@/components/InjornLivingLayer";
 import { InjornRouteTransition } from "@/components/InjornRouteTransition";
 import "./globals.css";
 import "./interaction.css";
@@ -14,6 +15,7 @@ import "./route-transitions.css";
 import "./ritual-interactions.css";
 import "./origin-burst.css";
 import "./migarazur-seal-fix.css";
+import "./living-layer.css";
 
 const display = Cormorant_Garamond({
   subsets: ["latin"],
@@ -43,6 +45,7 @@ export default function RootLayout({
     <html lang="pt-BR" className={`${display.variable} ${sans.variable}`}>
       <body>
         <InjornAmbientEffects />
+        <InjornLivingLayer />
         <InjornRouteTransition />
         {children}
       </body>
