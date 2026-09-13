@@ -1,0 +1,78 @@
+/* Refinamentos identificados na auditoria visual desktop/mobile. */
+
+@media (min-width: 851px) {
+  .lore-card-grid > .lore-card:last-child:nth-child(odd),
+  .figure-grid > .figure-card:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 850px) {
+  .travel-table__row > *:not(strong) {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .travel-table__row > *:not(strong)::before {
+    flex: 0 0 auto;
+    color: var(--gold-dim);
+    font-size: 0.54rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .travel-table__row > :nth-child(2)::before {
+    content: "Direção";
+  }
+
+  .travel-table__row > :nth-child(3)::before {
+    content: "A cavalo";
+  }
+
+  .travel-table__row > :nth-child(4)::before {
+    content: "A pé";
+  }
+
+  .travel-table__row > :nth-child(5)::before {
+    content: "Distância";
+  }
+
+  .knowledge-status {
+    white-space: normal;
+    line-height: 1.35;
+    text-align: right;
+  }
+
+  .lore-card__meta,
+  .figure-card__top,
+  .faction-card__meta,
+  .bestiary-card__meta {
+    align-items: flex-start;
+  }
+}
+
+@media (max-width: 560px) {
+  .travel-table__row > *:not(strong) {
+    min-height: 2rem;
+    padding-block: 0.55rem;
+    border-bottom: 1px solid var(--line-soft);
+  }
+
+  .travel-table__row > :last-child {
+    border-bottom: 0;
+  }
+}
+
+@media (hover: none) {
+  .portal-card,
+  .lore-card,
+  .figure-card,
+  .party-card,
+  .faction-card,
+  .bestiary-card {
+    transform: none;
+  }
+}
