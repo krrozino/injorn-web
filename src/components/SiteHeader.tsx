@@ -6,6 +6,8 @@ import { useEffect, useState } from "react";
 const navigation = [
   { label: "Mundo", href: "/mundo" },
   { label: "Personagens", href: "/personagens" },
+  { label: "Facções", href: "/faccoes" },
+  { label: "Bestiário", href: "/bestiario" },
   { label: "Crônicas", href: "/cronicas" },
   { label: "Arquivo", href: "/arquivo" },
   { label: "Ecos", href: "/ecos" },
