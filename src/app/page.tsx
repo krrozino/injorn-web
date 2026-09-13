@@ -76,9 +76,7 @@ export default function Home() {
         <div className="section-number">01</div>
         <div className="manifesto__content">
           <p className="kicker">Princípio de navegação</p>
-          <h2 id="manifesto-title">
-            Em Injorn, a interface faz parte da descoberta.
-          </h2>
+          <h2 id="manifesto-title">Em Injorn, a interface faz parte da descoberta.</h2>
           <p>
             Elementos importantes reagem porque carregam significado. Uma arma pode revelar sua
             história. Um brasão pode abrir uma casa. Um lugar pode conduzir a outra parte do mundo.
@@ -157,7 +155,7 @@ export default function Home() {
 
       <footer className="site-footer">
         <div className="site-footer__mark" aria-hidden="true">
-          I
+          <span>I</span>
         </div>
         <p>INJORN</p>
         <span>Arquivo público do mundo</span>
