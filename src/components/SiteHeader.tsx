@@ -25,7 +25,7 @@ export function SiteHeader() {
     <header className="site-header">
       <Link className="site-brand" href="/" aria-label="Injorn — início">
         <span className="site-brand__mark" aria-hidden="true">
-          I
+          <span>I</span>
         </span>
         <span>INJORN</span>
       </Link>
