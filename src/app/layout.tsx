@@ -20,6 +20,7 @@ import "./living-layer.css";
 import "./seven-gates.css";
 import "./route-compass.css";
 import "./identity-expansion.css";
+import "./deep-rituals.css";
 
 const display = Cormorant_Garamond({
   subsets: ["latin"],
