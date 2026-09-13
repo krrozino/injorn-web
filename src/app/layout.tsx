@@ -4,6 +4,7 @@ import "./globals.css";
 import "./interaction.css";
 import "./pages.css";
 import "./lore.css";
+import "./expanded-content.css";
 
 const display = Cormorant_Garamond({
   subsets: ["latin"],
