@@ -21,6 +21,7 @@ import "./seven-gates.css";
 import "./route-compass.css";
 import "./identity-expansion.css";
 import "./deep-rituals.css";
+import "./propaganda-poster.css";
 
 const display = Cormorant_Garamond({
   subsets: ["latin"],
