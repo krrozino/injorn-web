@@ -48,24 +48,31 @@ export default function MundoPage() {
             <p className="kicker">Cartografia conhecida</p>
             <h2 id="places-title">Lugares já revelados</h2>
           </div>
-          <p className="lore-section__aside">O mapa interativo será conectado a estes registros depois.</p>
+          <p className="lore-section__aside">Clique em um registro para abrir sua camada cartográfica.</p>
         </header>
 
-        <div className="lore-card-grid">
-          {knownPlaces.map((place) => (
-            <article className="lore-card" key={place.name}>
-              <div className="lore-card__meta">
-                <span>{place.kind}</span>
+        <div className="ritual-grid ritual-grid--atlas">
+          {knownPlaces.map((place, index) => (
+            <details className="ritual-record ritual-record--atlas" key={place.name}>
+              <summary>
+                <span className="ritual-record__index">{String(index + 1).padStart(2, "0")}</span>
+                <div className="ritual-record__summary-copy">
+                  <span>{place.kind}</span>
+                  <h3>{place.name}</h3>
+                </div>
                 <KnowledgeStatus status={place.status} />
+                <span className="ritual-record__command">abrir registro</span>
+              </summary>
+              <div className="ritual-record__body">
+                <div className="atlas-iris" aria-hidden="true"><i /><i /><i /><i /></div>
+                <p>{place.summary}</p>
+                <ul className="lore-list">
+                  {place.details.map((detail) => (
+                    <li key={detail}>{detail}</li>
+                  ))}
+                </ul>
               </div>
-              <h3>{place.name}</h3>
-              <p>{place.summary}</p>
-              <ul className="lore-list">
-                {place.details.map((detail) => (
-                  <li key={detail}>{detail}</li>
-                ))}
-              </ul>
-            </article>
+            </details>
           ))}
         </div>
       </section>
@@ -82,7 +89,7 @@ export default function MundoPage() {
           </p>
         </header>
 
-        <div className="travel-table" role="table" aria-label="Distâncias conhecidas de Injorn">
+        <div className="travel-table travel-table--ritual" role="table" aria-label="Distâncias conhecidas de Injorn">
           <div className="travel-table__row travel-table__row--head" role="row">
             <span role="columnheader">Destino</span>
             <span role="columnheader">Direção</span>
@@ -115,7 +122,7 @@ export default function MundoPage() {
           como documento histórico oficial, não como confirmação de que cada afirmação seja verdadeira.
         </p>
 
-        <div className="timeline">
+        <div className="timeline timeline--sealed">
           {officialTimeline.map((event) => (
             <article className="timeline__entry" key={`${event.year}-${event.title}`}>
               <div className="timeline__year">{event.year}</div>

@@ -26,24 +26,29 @@ export default function CronicasPage() {
         <header className="lore-section__heading">
           <div>
             <p className="kicker">Ato I → Ato II</p>
-            <h2 id="chronicles-title">Da Praga ao despertar de Vael Karun</h2>
+            <h2 id="chronicles-title">Corredor de memórias</h2>
           </div>
           <KnowledgeStatus status="observed" />
         </header>
 
-        <div className="chronicle-list">
+        <div className="memory-corridor">
           {campaignChronicles.map((chapter, index) => (
-            <article className="chronicle-entry" key={`${chapter.act}-${chapter.title}`}>
-              <div className="chronicle-entry__number">{String(index + 1).padStart(2, "0")}</div>
-              <div className="chronicle-entry__body">
-                <div className="chronicle-entry__meta">
+            <details className="memory-fold" key={`${chapter.act}-${chapter.title}`}>
+              <summary>
+                <span className="memory-fold__number">{String(index + 1).padStart(2, "0")}</span>
+                <span className="memory-fold__ember" aria-hidden="true" />
+                <div className="memory-fold__identity">
                   <span>{chapter.act}</span>
-                  <KnowledgeStatus status={chapter.status} />
+                  <h3>{chapter.title}</h3>
                 </div>
-                <h3>{chapter.title}</h3>
+                <span className="memory-fold__command">reabrir memória</span>
+              </summary>
+              <div className="memory-fold__body">
+                <div className="memory-fold__thread" aria-hidden="true"><i /><i /><i /></div>
+                <KnowledgeStatus status={chapter.status} />
                 <p>{chapter.text}</p>
               </div>
-            </article>
+            </details>
           ))}
         </div>
       </section>
@@ -55,7 +60,7 @@ export default function CronicasPage() {
             <h2 id="now-title">O castelo ainda não terminou de falar.</h2>
           </div>
         </header>
-        <div className="lore-prose lore-prose--lead">
+        <div className="lore-prose lore-prose--lead current-memory">
           <p>
             O grupo permanece em Vael Karun. O Nível -1 está aberto, o Guardião de Pedra foi
             desativado após o confronto, manifestações de memória começaram a surgir e uma presença

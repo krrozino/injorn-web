@@ -32,25 +32,34 @@ export default function BestiarioPage() {
           <KnowledgeStatus status="observed" />
         </header>
 
-        <div className="bestiary-grid">
-          {bestiary.map((creature) => (
-            <article className="bestiary-card" key={creature.name}>
-              <div className="bestiary-card__meta">
-                <span>{creature.category}</span>
-                <KnowledgeStatus status={creature.status} />
+        <div className="specimen-grid">
+          {bestiary.map((creature, index) => (
+            <details className="specimen-record" key={creature.name}>
+              <summary>
+                <span className="specimen-record__number">{String(index + 1).padStart(2, "0")}</span>
+                <div>
+                  <span>{creature.category}</span>
+                  <h3>{creature.name}</h3>
+                </div>
+                <span className="specimen-record__command">examinar registro</span>
+              </summary>
+              <div className="specimen-record__body">
+                <div className="specimen-record__scan" aria-hidden="true"><i /><i /><i /></div>
+                <div className="specimen-record__meta">
+                  <KnowledgeStatus status={creature.status} />
+                  <span>Primeiro registro · {creature.firstSeen}</span>
+                </div>
+                <p>{creature.summary}</p>
+                <div className="specimen-record__traits">
+                  <span>Traços observados</span>
+                  <ul className="lore-list">
+                    {creature.knownTraits.map((trait) => (
+                      <li key={trait}>{trait}</li>
+                    ))}
+                  </ul>
+                </div>
               </div>
-              <h3>{creature.name}</h3>
-              <div className="bestiary-card__first-seen">
-                <span>Primeiro registro</span>
-                <strong>{creature.firstSeen}</strong>
-              </div>
-              <p>{creature.summary}</p>
-              <ul className="lore-list">
-                {creature.knownTraits.map((trait) => (
-                  <li key={trait}>{trait}</li>
-                ))}
-              </ul>
-            </article>
+            </details>
           ))}
         </div>
       </section>
