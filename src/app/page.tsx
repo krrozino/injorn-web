@@ -8,7 +8,7 @@ const portals = [
     index: "I",
     eyebrow: "Atlas",
     title: "O Mundo",
-    text: "Reinos, cidades, fronteiras e lugares que já fazem parte do conhecimento dos jogadores.",
+    text: "Capital Injorn, Ponta da Luz, São Kael, Vael Karun e a cronologia oficial do reino.",
     action: "Explorar o mundo",
   },
   {
@@ -17,7 +17,7 @@ const portals = [
     index: "II",
     eyebrow: "Nomes",
     title: "Personagens",
-    text: "Figuras conhecidas, títulos, alianças e rastros deixados por quem move a história de Injorn.",
+    text: "Da imagem pública dos Von Helder às pessoas que já cruzaram o caminho dos aventureiros.",
     action: "Conhecer personagens",
   },
   {
@@ -26,7 +26,7 @@ const portals = [
     index: "III",
     eyebrow: "Memória",
     title: "Crônicas",
-    text: "A campanha registrada como capítulos de uma história, preservando apenas o que já foi revelado em jogo.",
+    text: "Da Praga e do Monastério ao despertar de Vael Karun, sem avançar além da última sessão confirmada.",
     action: "Ler as crônicas",
   },
   {
@@ -35,7 +35,7 @@ const portals = [
     index: "IV",
     eyebrow: "Documentos",
     title: "Arquivo",
-    text: "Cartas, decretos, artefatos, símbolos e registros encontrados durante a jornada.",
+    text: "Registros oficiais, descobertas sobre Migarazur, o dossiê da Praga e outros conhecimentos já liberados.",
     action: "Abrir o arquivo",
   },
 ];
@@ -96,8 +96,8 @@ export default function Home() {
             <h2>Portas para o mundo</h2>
           </div>
           <p>
-            A estrutura abaixo já é definitiva o bastante para crescer sem depender da arte final de
-            nenhum personagem.
+            O conteúdo é separado por origem: registro oficial, fato observado, descoberta do grupo
+            ou rumor. Assim, propaganda e verdade nunca precisam fingir ser a mesma coisa.
           </p>
         </header>
 
@@ -128,14 +128,14 @@ export default function Home() {
           <span />
         </div>
         <div className="chronicle-feature__content">
-          <p className="kicker">Crônicas</p>
-          <h2 id="chronicle-title">A história cresce depois de cada sessão.</h2>
+          <p className="kicker">Ato II · Sessão 11</p>
+          <h2 id="chronicle-title">O Guardião que não esqueceu.</h2>
           <p>
-            O site registra apenas o que já pode ser visto pelos jogadores. Bastidores, segredos e
-            planejamento continuam fora daqui.
+            Vael Karun despertou. O grupo já alcançou o Nível -1, enfrentou o Guardião de Pedra e
+            começou a perceber que as memórias do castelo não se comportam como simples gravações.
           </p>
           <Link className="text-link text-link--large" href="/cronicas">
-            Ver estrutura das crônicas
+            Continuar pelas crônicas
           </Link>
         </div>
       </section>
