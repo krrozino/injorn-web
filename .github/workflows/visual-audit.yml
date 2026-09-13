@@ -56,7 +56,7 @@ jobs:
           for page in "${pages[@]}"; do
             name="${page:-home}"
             npx playwright screenshot --browser=chromium --full-page --viewport-size="1440,1000" "http://127.0.0.1:3000/${page}" "visual-audit/desktop/${name}.png"
-            npx playwright screenshot --browser=chromium --full-page --device="iPhone 13" "http://127.0.0.1:3000/${page}" "visual-audit/mobile/${name}.png"
+            npx playwright screenshot --browser=chromium --full-page --viewport-size="390,844" "http://127.0.0.1:3000/${page}" "visual-audit/mobile/${name}.png"
           done
 
       - name: Upload screenshots
