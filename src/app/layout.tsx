@@ -13,6 +13,7 @@ import "./home-v2.css";
 import "./route-transitions.css";
 import "./ritual-interactions.css";
 import "./origin-burst.css";
+import "./migarazur-seal-fix.css";
 
 const display = Cormorant_Garamond({
   subsets: ["latin"],
