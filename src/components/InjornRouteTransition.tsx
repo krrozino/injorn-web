@@ -95,6 +95,15 @@ export function InjornRouteTransition() {
       event.preventDefault();
       const href = `${url.pathname}${url.search}${url.hash}`;
       pendingHref.current = href;
+
+      const rect = anchor.getBoundingClientRect();
+      const originX = event.clientX || rect.left + rect.width / 2;
+      const originY = event.clientY || rect.top + rect.height / 2;
+      document.documentElement.style.setProperty("--injorn-origin-x", `${originX}px`);
+      document.documentElement.style.setProperty("--injorn-origin-y", `${originY}px`);
+      document.documentElement.style.setProperty("--injorn-origin-w", `${Math.max(32, rect.width)}px`);
+      document.documentElement.style.setProperty("--injorn-origin-h", `${Math.max(32, rect.height)}px`);
+
       setKind(kindForPath(url.pathname));
       setPhase("covering");
 
@@ -129,6 +138,7 @@ export function InjornRouteTransition() {
       data-phase={phase}
       aria-hidden={phase === "idle"}
     >
+      <div className="injorn-transition__origin-burst" aria-hidden="true"><span /><i /><i /><i /></div>
       <div className="injorn-transition__veil" />
       <div className="injorn-transition__panel injorn-transition__panel--left"><span /></div>
       <div className="injorn-transition__panel injorn-transition__panel--right"><span /></div>
