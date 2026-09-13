@@ -1,0 +1,106 @@
+/* The transition now begins where the player clicked, so the object feels like a door. */
+:root {
+  --injorn-origin-x: 50vw;
+  --injorn-origin-y: 50vh;
+  --injorn-origin-w: 4rem;
+  --injorn-origin-h: 4rem;
+}
+
+.injorn-transition__origin-burst {
+  position: fixed;
+  z-index: -1;
+  left: var(--injorn-origin-x);
+  top: var(--injorn-origin-y);
+  width: max(var(--injorn-origin-w), 4rem);
+  height: max(var(--injorn-origin-h), 4rem);
+  transform: translate(-50%, -50%) scale(.18);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.injorn-transition__origin-burst > span {
+  position: absolute;
+  inset: 0;
+  border: 1px solid var(--transition-accent);
+  background: radial-gradient(circle, color-mix(in srgb, var(--transition-accent) 18%, transparent), transparent 65%);
+  box-shadow: 0 0 4rem color-mix(in srgb, var(--transition-accent) 20%, transparent);
+}
+
+.injorn-transition__origin-burst i {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 1px;
+  height: 170vmax;
+  transform-origin: 50% 50%;
+  background: linear-gradient(transparent, var(--transition-accent-bright), transparent);
+  opacity: .45;
+}
+
+.injorn-transition__origin-burst i:nth-child(2) { transform: translate(-50%, -50%) rotate(60deg); }
+.injorn-transition__origin-burst i:nth-child(3) { transform: translate(-50%, -50%) rotate(120deg); }
+
+.injorn-transition[data-phase="covering"] .injorn-transition__origin-burst {
+  opacity: 1;
+  animation: injorn-origin-open 760ms cubic-bezier(.76,0,.24,1) both;
+}
+
+.injorn-transition[data-phase="revealing"] .injorn-transition__origin-burst {
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(28);
+  transition: opacity 260ms ease;
+}
+
+.injorn-transition--atlas .injorn-transition__origin-burst > span {
+  border-radius: 50%;
+  background:
+    repeating-radial-gradient(circle, transparent 0 1.3rem, rgba(230,204,141,.1) 1.35rem 1.38rem),
+    rgba(9,21,15,.35);
+}
+
+.injorn-transition--portraits .injorn-transition__origin-burst > span {
+  border-radius: 50% 50% 8% 8%;
+  outline: 1px solid rgba(230,204,141,.13);
+  outline-offset: .65rem;
+}
+
+.injorn-transition--banners .injorn-transition__origin-burst > span {
+  clip-path: polygon(0 0,100% 0,86% 100%,50% 82%,14% 100%);
+  background: linear-gradient(90deg, rgba(23,71,47,.72), rgba(108,43,37,.5));
+}
+
+.injorn-transition--beast .injorn-transition__origin-burst > span {
+  border-color: rgba(141,74,61,.75);
+  transform: rotate(-7deg);
+  background: radial-gradient(circle, rgba(108,43,37,.23), transparent 65%);
+}
+
+.injorn-transition--memory .injorn-transition__origin-burst > span {
+  border-radius: 54% 46% 51% 49% / 47% 52% 48% 53%;
+  filter: blur(.2px);
+  background: radial-gradient(circle, rgba(239,229,203,.09), transparent 62%);
+}
+
+.injorn-transition--archive .injorn-transition__origin-burst > span {
+  transform: rotate(45deg);
+  background: linear-gradient(135deg, rgba(202,166,93,.22), rgba(9,21,15,.68));
+  box-shadow: 0 0 0 .7rem rgba(202,166,93,.04), 0 0 4rem rgba(202,166,93,.2);
+}
+
+.injorn-transition--echoes .injorn-transition__origin-burst > span {
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 1.1rem rgba(119,165,111,.04),
+    0 0 0 2.2rem rgba(119,165,111,.025),
+    0 0 4rem rgba(119,165,111,.18);
+}
+
+@keyframes injorn-origin-open {
+  0% { transform: translate(-50%, -50%) scale(.16) rotate(-4deg); filter: brightness(2.2); }
+  42% { transform: translate(-50%, -50%) scale(1.15) rotate(1deg); filter: brightness(1.2); }
+  100% { transform: translate(-50%, -50%) scale(28) rotate(0); filter: brightness(.75); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .injorn-transition__origin-burst { display: none !important; }
+}
