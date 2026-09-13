@@ -16,17 +16,17 @@ function dispatchFor(pathname: string) {
 export function InjornLivingLayer() {
   const pathname = usePathname();
   const [lens, setLens] = useState(false);
-  const [dispatch, setDispatch] = useState(false);
-  const [anomaly, setAnomaly] = useState(false);
+  const [dispatchPath, setDispatchPath] = useState<string | null>(null);
+  const [anomalyPath, setAnomalyPath] = useState<string | null>(null);
   const fired = useRef({ path: pathname, dispatch: false, anomaly: false });
   const dispatchTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const anomalyTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  const dispatchVisible = dispatchPath === pathname;
+  const anomalyVisible = anomalyPath === pathname;
+
   useEffect(() => {
     fired.current = { path: pathname, dispatch: false, anomaly: false };
-    setDispatch(false);
-    setAnomaly(false);
-
     if (dispatchTimer.current) clearTimeout(dispatchTimer.current);
     if (anomalyTimer.current) clearTimeout(anomalyTimer.current);
   }, [pathname]);
@@ -47,15 +47,21 @@ export function InjornLivingLayer() {
 
       if (!fired.current.dispatch && progress > 0.16) {
         fired.current.dispatch = true;
-        setDispatch(true);
-        dispatchTimer.current = setTimeout(() => setDispatch(false), reduced ? 1000 : 3200);
+        setDispatchPath(pathname);
+        dispatchTimer.current = setTimeout(
+          () => setDispatchPath((current) => (current === pathname ? null : current)),
+          reduced ? 1000 : 3200,
+        );
       }
 
       const canDisturb = pathname.startsWith("/mundo") || pathname.startsWith("/cronicas");
       if (canDisturb && !fired.current.anomaly && progress > 0.68) {
         fired.current.anomaly = true;
-        setAnomaly(true);
-        anomalyTimer.current = setTimeout(() => setAnomaly(false), reduced ? 700 : 2200);
+        setAnomalyPath(pathname);
+        anomalyTimer.current = setTimeout(
+          () => setAnomalyPath((current) => (current === pathname ? null : current)),
+          reduced ? 700 : 2200,
+        );
       }
     };
 
@@ -95,7 +101,7 @@ export function InjornLivingLayer() {
         </div>
       </div>
 
-      <aside className={`royal-dispatch ${dispatch ? "royal-dispatch--show" : ""}`} aria-hidden={!dispatch}>
+      <aside className={`royal-dispatch ${dispatchVisible ? "royal-dispatch--show" : ""}`} aria-hidden={!dispatchVisible}>
         <span className="royal-dispatch__seal" aria-hidden="true">VII</span>
         <div>
           <small>COMUNICADO DO REINO</small>
@@ -104,7 +110,7 @@ export function InjornLivingLayer() {
         <i aria-hidden="true" />
       </aside>
 
-      <div className={`vael-anomaly ${anomaly ? "vael-anomaly--show" : ""}`} aria-hidden="true">
+      <div className={`vael-anomaly ${anomalyVisible ? "vael-anomaly--show" : ""}`} aria-hidden="true">
         <span className="vael-anomaly__edge vael-anomaly__edge--top" />
         <span className="vael-anomaly__edge vael-anomaly__edge--bottom" />
         <div className="vael-anomaly__signal">
