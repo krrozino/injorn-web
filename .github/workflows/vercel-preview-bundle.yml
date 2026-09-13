@@ -1,0 +1,116 @@
+name: Vercel Preview Bundle
+
+on:
+  push:
+    branches:
+      - feat/foundation-v1
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  bundle:
+    name: Build self-contained preview
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Enable static export for preview artifact
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('next.config.ts')
+          s = p.read_text()
+          s = s.replace('const nextConfig: NextConfig = {', 'const nextConfig: NextConfig = {\n  output: "export",\n  trailingSlash: true,')
+          p.write_text(s)
+          PY
+
+      - name: Build static export
+        run: npm run build
+
+      - name: Assemble single-file SPA preview
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json, re
+
+          out = Path('out')
+          routes = ['', 'mundo', 'personagens', 'faccoes', 'bestiario', 'cronicas', 'arquivo', 'ecos']
+          titles = {
+            '/': 'Injorn', '/mundo': 'Mundo — Injorn', '/personagens': 'Personagens — Injorn',
+            '/faccoes': 'Facções — Injorn', '/bestiario': 'Bestiário — Injorn', '/cronicas': 'Crônicas — Injorn',
+            '/arquivo': 'Arquivo — Injorn', '/ecos': 'Ecos — Injorn'
+          }
+
+          style_files = [
+            'src/app/globals.css',
+            'src/app/interaction.css',
+            'src/app/pages.css',
+            'src/app/lore.css',
+            'src/app/expanded-content.css',
+            'src/app/audit-fixes.css',
+          ]
+          css = ''.join(Path(p).read_text() for p in style_files)
+          css += ':root{--font-display:Georgia,"Times New Roman",serif;--font-sans:Arial,Helvetica,sans-serif}'
+
+          mains = {}
+          root_html = None
+          for route in routes:
+            path = out / ('index.html' if not route else f'{route}/index.html')
+            text = path.read_text()
+            if not route:
+              root_html = text
+            m = re.search(r'(<main\b.*?</main>)', text, re.S)
+            if not m:
+              raise SystemExit(f'main not found for {route}')
+            mains['/' + route if route else '/'] = m.group(1)
+
+          assert root_html is not None
+          root_html = re.sub(r'<script\b[^>]*>.*?</script>', '', root_html, flags=re.S)
+          root_html = re.sub(r'<link\b[^>]*(?:rel="stylesheet"|as="font")[^>]*>', '', root_html, flags=re.I)
+          root_html = re.sub(r'<link\b[^>]*rel="preload"[^>]*>', '', root_html, flags=re.I)
+          root_html = re.sub(r'<main\b.*?</main>', mains['/'], root_html, count=1, flags=re.S)
+
+          runtime = r'''<script>(function(){
+          const pages=__PAGES__,titles=__TITLES__;
+          function norm(p){p=p.replace(/\/+$/,'')||'/';return pages[p]?p:'/';}
+          function bind(){
+            const b=document.querySelector('.menu-trigger'),m=document.querySelector('.mobile-menu');
+            if(b&&m){b.onclick=()=>{const o=b.getAttribute('aria-expanded')!=='true';b.setAttribute('aria-expanded',String(o));b.setAttribute('aria-label',o?'Fechar menu':'Abrir menu');m.classList.toggle('mobile-menu--open',o);m.setAttribute('aria-hidden',String(!o));document.body.dataset.menuOpen=o?'true':'false'};}
+          }
+          function render(path,push){path=norm(path);const cur=document.querySelector('main');if(cur){cur.outerHTML=pages[path];}document.title=titles[path]||'Injorn';if(push)history.pushState({},'',path);bind();window.scrollTo({top:0,behavior:'instant'});}
+          document.addEventListener('click',e=>{const a=e.target.closest&&e.target.closest('a[href^="/"]');if(!a)return;const u=new URL(a.href,location.origin);if(pages[norm(u.pathname)]){e.preventDefault();render(u.pathname,true);}});
+          addEventListener('popstate',()=>render(location.pathname,false));
+          if(norm(location.pathname)!=='/'||location.pathname!=='/')render(location.pathname,false);else bind();
+          })();</script>'''
+          runtime = runtime.replace('__PAGES__', json.dumps(mains, ensure_ascii=False)).replace('__TITLES__', json.dumps(titles, ensure_ascii=False))
+          root_html = root_html.replace('</head>', f'<style>{css}</style></head>')
+          root_html = root_html.replace('</body>', runtime + '</body>')
+          root_html = re.sub(r'>\s+<', '><', root_html)
+          Path('preview.html').write_text(root_html)
+          Path('vercel.json').write_text(json.dumps({'rewrites':[{'source':'/(.*)','destination':'/index.html'}]}))
+          print('preview bytes', Path('preview.html').stat().st_size)
+          PY
+
+      - name: Upload preview bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: injorn-vercel-preview-bundle
+          path: |
+            preview.html
+            vercel.json
+          if-no-files-found: error
+          retention-days: 1

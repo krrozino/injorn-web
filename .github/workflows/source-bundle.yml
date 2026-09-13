@@ -1,0 +1,32 @@
+name: Source Bundle
+
+on:
+  push:
+    branches:
+      - feat/foundation-v1
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  bundle:
+    name: Package source for preview deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Upload source
+        uses: actions/upload-artifact@v4
+        with:
+          name: injorn-vercel-source
+          path: |
+            package.json
+            package-lock.json
+            next.config.ts
+            next-env.d.ts
+            tsconfig.json
+            src
+          if-no-files-found: error
+          retention-days: 1
