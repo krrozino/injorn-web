@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { FactionTable } from "@/components/FactionTable";
 import { KnowledgeStatus } from "@/components/KnowledgeStatus";
 import { PublicPage } from "@/components/PublicPage";
 import { factions } from "@/content/factions";
@@ -23,39 +24,56 @@ export default function FaccoesPage() {
         </p>
       </section>
 
+      <section className="lore-section" aria-labelledby="power-table-title">
+        <header className="lore-section__heading">
+          <div>
+            <p className="kicker">Leitura política</p>
+            <h2 id="power-table-title">Mesa das forças conhecidas</h2>
+          </div>
+          <p className="lore-section__aside">
+            Gire a mesa e selecione um estandarte. O círculo organiza consulta, não alianças ocultas.
+          </p>
+        </header>
+        <FactionTable factions={factions} />
+      </section>
+
       <section className="lore-section" aria-labelledby="factions-title">
         <header className="lore-section__heading">
           <div>
             <p className="kicker">Forças em movimento</p>
-            <h2 id="factions-title">Quem disputa o futuro de Injorn</h2>
+            <h2 id="factions-title">Arquivo dos estandartes</h2>
           </div>
           <p className="lore-section__aside">
-            O mesmo nome pode aparecer de forma muito diferente na propaganda oficial e na
-            experiência dos aventureiros.
+            Cada força ocupa seu próprio espaço visual. Abra um estandarte para ver somente o que já chegou aos jogadores.
           </p>
         </header>
 
-        <div className="faction-grid">
-          {factions.map((faction) => (
-            <article className="faction-card" key={faction.name}>
-              <div className="faction-card__meta">
-                <span>{faction.kind}</span>
-                <KnowledgeStatus status={faction.status} />
-              </div>
-              <h3>{faction.name}</h3>
-              {faction.aliases?.length ? (
-                <div className="tag-row" aria-label={`Nomes conhecidos de ${faction.name}`}>
-                  {faction.aliases.map((alias) => (
-                    <span key={alias}>{alias}</span>
-                  ))}
+        <div className="banner-grid">
+          {factions.map((faction, index) => (
+            <details className="banner-record" key={faction.name}>
+              <summary>
+                <span className="banner-record__pole" aria-hidden="true"><i /></span>
+                <span className="banner-record__index">{String(index + 1).padStart(2, "0")}</span>
+                <div className="banner-record__identity">
+                  <span>{faction.kind}</span>
+                  <h3>{faction.name}</h3>
                 </div>
-              ) : null}
-              <p>{faction.summary}</p>
-              <div className="faction-card__note">
-                <span>O que o grupo sabe</span>
-                <p>{faction.playerNote}</p>
+                <KnowledgeStatus status={faction.status} />
+                <span className="banner-record__command">erguer estandarte</span>
+              </summary>
+              <div className="banner-record__body">
+                {faction.aliases?.length ? (
+                  <div className="tag-row" aria-label={`Nomes conhecidos de ${faction.name}`}>
+                    {faction.aliases.map((alias) => <span key={alias}>{alias}</span>)}
+                  </div>
+                ) : null}
+                <p>{faction.summary}</p>
+                <div className="banner-record__intel">
+                  <span>O que o grupo sabe</span>
+                  <p>{faction.playerNote}</p>
+                </div>
               </div>
-            </article>
+            </details>
           ))}
         </div>
       </section>

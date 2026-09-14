@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { PageFoldRitual } from "@/components/PageFoldRitual";
 import { SiteHeader } from "@/components/SiteHeader";
 
 interface PublicPageProps {
@@ -9,9 +10,20 @@ interface PublicPageProps {
   children: ReactNode;
 }
 
+function pageVariant(title: string) {
+  return title
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
+}
+
 export function PublicPage({ eyebrow, title, intro, children }: PublicPageProps) {
+  const variant = pageVariant(title);
+
   return (
-    <main className="public-page">
+    <main className={`public-page public-page--${variant}`}>
       <SiteHeader />
 
       <header className="public-page__hero section-shell">
@@ -26,6 +38,7 @@ export function PublicPage({ eyebrow, title, intro, children }: PublicPageProps)
           <i />
           <span />
         </div>
+        <PageFoldRitual key={variant} />
       </header>
 
       <div className="public-page__content section-shell">{children}</div>

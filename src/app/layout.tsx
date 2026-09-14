@@ -1,11 +1,31 @@
 import type { Metadata } from "next";
 import { Cormorant_Garamond, Manrope } from "next/font/google";
+import { ArchiveBreath } from "@/components/ArchiveBreath";
+import { InjornAmbientEffects } from "@/components/InjornAmbientEffects";
+import { InjornLivingLayer } from "@/components/InjornLivingLayer";
+import { InjornRouteTransition } from "@/components/InjornRouteTransition";
+import { SevenGatesMenu } from "@/components/SevenGatesMenu";
+import { SevenSealsLedger } from "@/components/SevenSealsLedger";
 import "./globals.css";
 import "./interaction.css";
 import "./pages.css";
 import "./lore.css";
 import "./expanded-content.css";
 import "./audit-fixes.css";
+import "./injorn-identity.css";
+import "./home-v2.css";
+import "./route-transitions.css";
+import "./ritual-interactions.css";
+import "./origin-burst.css";
+import "./migarazur-seal-fix.css";
+import "./living-layer.css";
+import "./seven-gates.css";
+import "./seven-seals-ledger.css";
+import "./page-fold-breath.css";
+import "./route-compass.css";
+import "./identity-expansion.css";
+import "./deep-rituals.css";
+import "./propaganda-poster.css";
 
 const display = Cormorant_Garamond({
   subsets: ["latin"],
@@ -33,7 +53,15 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-BR" className={`${display.variable} ${sans.variable}`}>
-      <body>{children}</body>
+      <body>
+        <InjornAmbientEffects />
+        <InjornLivingLayer />
+        <ArchiveBreath />
+        <SevenGatesMenu />
+        <SevenSealsLedger />
+        <InjornRouteTransition />
+        {children}
+      </body>
     </html>
   );
 }
