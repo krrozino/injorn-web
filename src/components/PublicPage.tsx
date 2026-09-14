@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { PageFoldRitual } from "@/components/PageFoldRitual";
 import { SiteHeader } from "@/components/SiteHeader";
 
 interface PublicPageProps {
@@ -37,6 +38,7 @@ export function PublicPage({ eyebrow, title, intro, children }: PublicPageProps)
           <i />
           <span />
         </div>
+        <PageFoldRitual key={variant} />
       </header>
 
       <div className="public-page__content section-shell">{children}</div>
