@@ -3,7 +3,7 @@
 import type { CSSProperties } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 
 const folios = [
   { href: "/mundo", sigil: "I", label: "Mundo", office: "Atlas Real" },
@@ -15,16 +15,44 @@ const folios = [
   { href: "/ecos", sigil: "VII", label: "Ecos", office: "Mesa de Ressonância" },
 ];
 
+function folioForPath(path: string) {
+  return folios.find((folio) => path.startsWith(folio.href));
+}
+
 export function SevenSealsLedger() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
-  const [visited, setVisited] = useState<string[]>([]);
+  const [visited, setVisited] = useState<string[]>(() => {
+    const current = folioForPath(pathname);
+    return current ? [current.href] : [];
+  });
 
   useEffect(() => {
-    const current = folios.find((folio) => pathname.startsWith(folio.href));
-    if (!current) return;
-    setVisited((existing) => existing.includes(current.href) ? existing : [...existing, current.href]);
-  }, [pathname]);
+    const markPath = (path: string) => {
+      const match = folioForPath(path);
+      if (!match) return;
+      setVisited((existing) => existing.includes(match.href) ? existing : [...existing, match.href]);
+    };
+
+    const onDocumentClick = (event: MouseEvent) => {
+      const target = event.target instanceof Element ? event.target.closest("a[href]") : null;
+      if (!(target instanceof HTMLAnchorElement)) return;
+      try {
+        const destination = new URL(target.href, window.location.origin);
+        if (destination.origin === window.location.origin) markPath(destination.pathname);
+      } catch {
+        // Ignore malformed or non-navigation anchors.
+      }
+    };
+
+    const onPopState = () => markPath(window.location.pathname);
+    document.addEventListener("click", onDocumentClick, true);
+    window.addEventListener("popstate", onPopState);
+    return () => {
+      document.removeEventListener("click", onDocumentClick, true);
+      window.removeEventListener("popstate", onPopState);
+    };
+  }, []);
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
@@ -34,7 +62,7 @@ export function SevenSealsLedger() {
     return () => window.removeEventListener("keydown", onKey);
   }, []);
 
-  const sealed = useMemo(() => folios.filter((folio) => visited.includes(folio.href)).length, [visited]);
+  const sealed = folios.filter((folio) => visited.includes(folio.href)).length;
   const complete = sealed === folios.length;
 
   return (
