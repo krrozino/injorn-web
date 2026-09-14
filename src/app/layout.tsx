@@ -4,6 +4,7 @@ import { InjornAmbientEffects } from "@/components/InjornAmbientEffects";
 import { InjornLivingLayer } from "@/components/InjornLivingLayer";
 import { InjornRouteTransition } from "@/components/InjornRouteTransition";
 import { SevenGatesMenu } from "@/components/SevenGatesMenu";
+import { SevenSealsLedger } from "@/components/SevenSealsLedger";
 import "./globals.css";
 import "./interaction.css";
 import "./pages.css";
@@ -18,6 +19,7 @@ import "./origin-burst.css";
 import "./migarazur-seal-fix.css";
 import "./living-layer.css";
 import "./seven-gates.css";
+import "./seven-seals-ledger.css";
 import "./route-compass.css";
 import "./identity-expansion.css";
 import "./deep-rituals.css";
@@ -53,6 +55,7 @@ export default function RootLayout({
         <InjornAmbientEffects />
         <InjornLivingLayer />
         <SevenGatesMenu />
+        <SevenSealsLedger />
         <InjornRouteTransition />
         {children}
       </body>
