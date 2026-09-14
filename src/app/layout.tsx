@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Cormorant_Garamond, Manrope } from "next/font/google";
+import { ArchiveBreath } from "@/components/ArchiveBreath";
 import { InjornAmbientEffects } from "@/components/InjornAmbientEffects";
 import { InjornLivingLayer } from "@/components/InjornLivingLayer";
 import { InjornRouteTransition } from "@/components/InjornRouteTransition";
@@ -20,6 +21,7 @@ import "./migarazur-seal-fix.css";
 import "./living-layer.css";
 import "./seven-gates.css";
 import "./seven-seals-ledger.css";
+import "./page-fold-breath.css";
 import "./route-compass.css";
 import "./identity-expansion.css";
 import "./deep-rituals.css";
@@ -54,6 +56,7 @@ export default function RootLayout({
       <body>
         <InjornAmbientEffects />
         <InjornLivingLayer />
+        <ArchiveBreath />
         <SevenGatesMenu />
         <SevenSealsLedger />
         <InjornRouteTransition />
