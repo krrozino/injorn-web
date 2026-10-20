@@ -135,7 +135,7 @@ export function AtlasPlacesDirectory({
                 Estes marcos representam lugares já documentados publicamente em Injorn.
                 A história do universo é maior do que os caminhos percorridos pelos aventureiros.
               </p>
-              <p>As âncoras geográficas serão homologadas pelo mestre antes de irem à produção.</p>
+              <p>As posições da Capital de Injorn, de São Kael e de Vael Karun foram homologadas pelo criador de Injorn.</p>
             </>
           )}
         </article>
