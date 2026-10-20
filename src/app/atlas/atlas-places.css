@@ -1,0 +1,218 @@
+/* M1 — catálogo e detalhes de lugares já publicados. */
+.atlas-places-catalog {
+  margin-top: 1.25rem;
+  border: 1px solid rgba(202, 166, 93, 0.28);
+  background: linear-gradient(140deg, rgba(13, 30, 20, .96), rgba(5, 10, 7, .98));
+  color: var(--injorn-gold-300);
+}
+.atlas-places-catalog__heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding: 1.45rem 1.5rem;
+  border-bottom: 1px solid rgba(202, 166, 93, .23);
+}
+.atlas-places-catalog__heading h2,
+.atlas-place-detail h3 {
+  margin: .3rem 0;
+  font-family: var(--font-display), serif;
+  font-size: clamp(1.55rem, 3vw, 2.25rem);
+  color: #f1e3c2;
+}
+.atlas-places-catalog__heading p,
+.atlas-place-detail p { margin: .5rem 0 0; color: rgba(239, 229, 203, .77); line-height: 1.65; }
+.atlas-places-catalog__kicker { font-size: .68rem; letter-spacing: .13em; text-transform: uppercase; color: var(--injorn-gold-500); }
+.atlas-places-toggle, .atlas-place-detail__actions button, .atlas-place-detail__actions a {
+  padding: .65rem .9rem;
+  border: 1px solid rgba(202, 166, 93, .55);
+  color: #f1e3c2;
+  background: rgba(202, 166, 93, .11);
+  cursor: pointer;
+  text-decoration: none;
+  font-size: .82rem;
+}
+.atlas-places-toggle:focus-visible,
+.atlas-place-entry:focus-visible,
+.atlas-places-directory input:focus-visible,
+.atlas-place-detail__actions button:focus-visible,
+.atlas-place-detail__actions a:focus-visible {
+  outline: 2px solid #e6cc8d;
+  outline-offset: 3px;
+}
+.atlas-places-catalog__body { display: grid; grid-template-columns: minmax(230px, .9fr) minmax(0, 1.7fr); }
+.atlas-places-directory {
+  padding: 1.35rem;
+  border-right: 1px solid rgba(202, 166, 93, .2);
+}
+.atlas-places-directory label { display: block; font-size: .81rem; font-weight: 700; margin-bottom: .65rem; }
+.atlas-places-directory input {
+  width: 100%;
+  min-height: 44px;
+  border: 1px solid rgba(202,166,93,.35);
+  border-radius: 0;
+  background: rgba(0,0,0,.32);
+  color: #fff;
+  padding: .65rem .8rem;
+  font: inherit;
+}
+.atlas-places-directory input::placeholder { color: rgba(239, 229, 203, .46); }
+.atlas-places-directory__list { margin-top: 1rem; display: grid; gap: .45rem; }
+.atlas-place-entry {
+  display: grid;
+  gap: .35rem;
+  padding: .85rem .95rem;
+  border: 1px solid rgba(202, 166, 93, .15);
+  text-align: left;
+  background: rgba(202, 166, 93, .045);
+  color: #f1e3c2;
+  cursor: pointer;
+  transition: background 150ms ease, border-color 150ms ease;
+}
+.atlas-place-entry:hover, .atlas-place-entry--selected {
+  border-color: rgba(202,166,93,.62);
+  background: rgba(202,166,93,.15);
+}
+.atlas-place-entry strong { font: 600 1.15rem var(--font-display), serif; }
+.atlas-place-entry span { color: rgba(239,229,203,.57); font-size: .75rem; }
+.atlas-places-directory__notice,
+.atlas-places-directory__empty { font-size: .77rem; line-height: 1.6; color: rgba(239,229,203,.6); }
+.atlas-places-directory__notice { margin: 1rem 0 0; }
+.atlas-place-detail { min-height: 16rem; padding: clamp(1.25rem, 3vw, 2rem); }
+.atlas-place-detail ul { margin: 1.3rem 0; display: grid; gap: .65rem; padding-left: 1.1rem; color: rgba(239,229,203,.75); line-height: 1.55; }
+.atlas-place-detail li::marker { color: var(--injorn-gold-500); }
+.atlas-place-detail__actions { display: flex; flex-wrap: wrap; gap: .7rem; margin-top: 1.5rem; }
+.atlas-place-marker { cursor: pointer; filter: drop-shadow(0 0 4px rgba(0,0,0,.85)); }
+@media (max-width: 720px) {
+  .atlas-places-catalog__heading { align-items: flex-start; flex-direction: column; }
+  .atlas-places-catalog__body { grid-template-columns: 1fr; }
+  .atlas-places-directory { border-right: 0; border-bottom: 1px solid rgba(202,166,93,.2); }
+  .atlas-place-detail { min-height: 12rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .atlas-place-entry { transition: none; }
+}
+
+/* Modo foco M1: mapa e catálogo pertencem à mesma superfície acessível.
+ * Em desktop são colunas; no mobile, mapa em cima e catálogo rolável abaixo. */
+.atlas-viewer-frame--fullscreen {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(300px, 350px);
+  grid-template-rows: minmax(0, 1fr) auto;
+  height: 100dvh;
+  width: 100vw;
+  max-width: 100vw;
+}
+.atlas-viewer-frame--fullscreen .atlas-map-container {
+  grid-column: 1;
+  grid-row: 1 / -1;
+  min-height: 0;
+  height: 100%;
+  min-width: 0;
+}
+.atlas-viewer-frame--fullscreen .atlas-places-catalog {
+  grid-column: 2;
+  grid-row: 1 / -1;
+  margin: 0;
+  min-height: 0;
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+  z-index: 600;
+  border-top: 0;
+  border-bottom: 0;
+  border-right: 0;
+}
+.atlas-viewer-frame--fullscreen .atlas-places-catalog__heading {
+  align-items: flex-start;
+  flex-direction: column;
+}
+.atlas-viewer-frame--fullscreen .atlas-places-catalog__body {
+  display: block;
+}
+.atlas-viewer-frame--fullscreen .atlas-places-directory {
+  border-right: 0;
+  border-bottom: 1px solid rgba(202, 166, 93, .2);
+}
+.atlas-viewer-frame--fullscreen .atlas-toolbar {
+  right: calc(350px + 14px);
+}
+.atlas-viewer-frame--fullscreen .atlas-drawer {
+  right: calc(350px + 14px);
+}
+.atlas-viewer-frame--fullscreen .atlas-viewer-footer {
+  grid-column: 1;
+  grid-row: 2;
+  z-index: 400;
+  pointer-events: none;
+}
+@media (max-width: 720px) {
+  .atlas-viewer-frame--fullscreen {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: minmax(0, 55fr) minmax(0, 45fr);
+  }
+  .atlas-viewer-frame--fullscreen .atlas-map-container {
+    grid-column: 1;
+    grid-row: 1;
+    height: 100%;
+    min-height: 0;
+  }
+  .atlas-viewer-frame--fullscreen .atlas-places-catalog {
+    grid-column: 1;
+    grid-row: 2;
+    border-top: 1px solid rgba(202, 166, 93, .3);
+    border-left: 0;
+  }
+  .atlas-viewer-frame--fullscreen .atlas-toolbar {
+    right: 10px;
+  }
+  .atlas-viewer-frame--fullscreen .atlas-drawer {
+    top: 55px;
+    right: 8px;
+    max-height: calc(55% - 65px);
+  }
+  .atlas-viewer-frame--fullscreen .atlas-inspector-badge {
+    bottom: calc(45% + 8px);
+  }
+  .atlas-viewer-frame--fullscreen .atlas-viewer-footer {
+    display: none;
+  }
+}
+
+/* P2 — Stacking: Leaflet owns a separate, lowest painting context.
+ * Its panes use z-index internally; these values must never compete with
+ * the top-level map toolbar/drawer after zoom, pan or invalidateSize. */
+.atlas-viewer-frame {
+  isolation: isolate;
+}
+.atlas-viewer-frame .atlas-map-container {
+  position: relative;
+  z-index: 0;
+  isolation: isolate;
+}
+.atlas-viewer-frame .atlas-toolbar { z-index: 850; }
+.atlas-viewer-frame .atlas-drawer { z-index: 860; }
+.atlas-viewer-frame .atlas-inspector-badge { z-index: 830; }
+.atlas-viewer-frame .atlas-viewer-footer { z-index: 810; }
+.atlas-viewer-frame--fullscreen {
+  z-index: 2200;
+}
+
+/* Em foco, os widgets globais não podem abrir outros modais nem cobrir o
+ * catálogo. O hook também aplica inert aos irmãos do diálogo, removendo-os
+ * do Tab e da árvore de acessibilidade; CSS complementa o isolamento visual. */
+body[data-injorn-atlas-focus="true"] {
+  overflow: hidden;
+}
+body[data-injorn-atlas-focus="true"] :is(
+  .seven-gates-trigger,
+  .seven-gates,
+  .seven-seals-trigger,
+  .seven-seals,
+  .dissonance-toggle,
+  .archive-breath
+) {
+  visibility: hidden !important;
+  pointer-events: none !important;
+}

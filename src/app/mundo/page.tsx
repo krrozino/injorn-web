@@ -4,6 +4,7 @@ import { KnowledgeStatus } from "@/components/KnowledgeStatus";
 import { PublicPage } from "@/components/PublicPage";
 import { RouteCompass } from "@/components/RouteCompass";
 import { knownPlaces, officialTimeline, spoilerBoundary } from "@/content/playerKnowledge";
+import { publicPlaceRecordId } from "@/content/placeRecord";
 import { knownTravelDistances } from "@/content/travel";
 
 export const metadata: Metadata = {
@@ -75,7 +76,7 @@ export default function MundoPage() {
 
         <div className="ritual-grid ritual-grid--atlas">
           {knownPlaces.map((place, index) => (
-            <details className="ritual-record ritual-record--atlas" key={place.name}>
+            <details id={publicPlaceRecordId(place.name)} className="ritual-record ritual-record--atlas" key={place.name}>
               <summary>
                 <span className="ritual-record__index">{String(index + 1).padStart(2, "0")}</span>
                 <div className="ritual-record__summary-copy">

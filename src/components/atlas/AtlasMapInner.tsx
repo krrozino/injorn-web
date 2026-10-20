@@ -1,23 +1,36 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, useCallback } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import {
   canonicalKingdomMap,
   initialAtlasLayers,
   latLngToNormalized,
+  normalizedToLatLng,
 } from "@/content/atlas";
 import type { NormalizedCoordinate } from "@/types/atlas";
+import { AtlasPlacesDirectory, publicPlaces } from "@/components/atlas/AtlasPlacesDirectory";
+import { atlasPanOptions, atlasFitOptions } from "@/components/atlas/atlasMotion";
+import { isolateOutsideAtlasDialog } from "@/components/atlas/atlasModalIsolation";
 
 export default function AtlasMapInner() {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const frameRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<L.Map | null>(null);
+  const placesLayerRef = useRef<L.LayerGroup | null>(null);
+  const focusReturnRef = useRef<HTMLElement | null>(null);
+  const wasFullscreenRef = useRef(false);
+  const fullscreenButtonRef = useRef<HTMLButtonElement>(null);
 
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const layers = initialAtlasLayers;
+  const [showPlaces, setShowPlaces] = useState(true);
+  const [placeQuery, setPlaceQuery] = useState("");
+  const [selectedPlaceId, setSelectedPlaceId] = useState<string | null>(null);
+  const layers = initialAtlasLayers.map((layer) =>
+    layer.id === "places" ? { ...layer, visible: showPlaces } : layer
+  );
   const [cursorCoords, setCursorCoords] = useState<NormalizedCoordinate | null>(null);
   const [pinnedCoords, setPinnedCoords] = useState<NormalizedCoordinate | null>(null);
   const [copyNotice, setCopyNotice] = useState<string | null>(null);
@@ -34,8 +47,7 @@ export default function AtlasMapInner() {
       [height, width],
     ];
     mapInstanceRef.current.fitBounds(bounds, {
-      padding: [12, 12],
-      animate: true,
+      ...atlasFitOptions(window.matchMedia("(prefers-reduced-motion: reduce)").matches),
     });
   }, [height, width]);
 
@@ -48,19 +60,48 @@ export default function AtlasMapInner() {
     mapInstanceRef.current?.zoomOut();
   }, []);
 
-  // Alterna o modo foco / expansão da tela
+  // O modo foco não desmonta o Leaflet e mantém catálogo e mapa no mesmo frame.
   const handleToggleFullscreen = useCallback(() => {
-    setIsFullscreen((prev) => {
-      const next = !prev;
-      setTimeout(() => {
-        if (mapInstanceRef.current) {
-          mapInstanceRef.current.invalidateSize();
-          handleRecenter();
-        }
-      }, 200);
-      return next;
-    });
-  }, [handleRecenter]);
+    setIsFullscreen((value) => !value);
+  }, []);
+
+  const handleSelectPlace = useCallback((id: string) => {
+    const place = publicPlaces.find((entry) => entry.id === id);
+    if (!place) return;
+    setSelectedPlaceId(place.id);
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    mapInstanceRef.current?.panTo(normalizedToLatLng(place.geometry), atlasPanOptions(reduceMotion));
+  }, []);
+
+  // Isolar controle de foco e clique fora do painel enquanto o modo foco estiver aberto.
+  useLayoutEffect(() => {
+    if (!isFullscreen || !frameRef.current) return;
+    const restore = isolateOutsideAtlasDialog(frameRef.current, document.body);
+    document.body.dataset.injornAtlasFocus = "true";
+    return () => {
+      restore();
+      delete document.body.dataset.injornAtlasFocus;
+    };
+  }, [isFullscreen]);
+
+  // Revalidar o tamanho após o layout mudar, restaurando o foco no retorno.
+  useEffect(() => {
+    if (wasFullscreenRef.current === isFullscreen) return;
+    wasFullscreenRef.current = isFullscreen;
+    if (isFullscreen) {
+      focusReturnRef.current = document.activeElement instanceof HTMLElement
+        ? document.activeElement : null;
+      fullscreenButtonRef.current?.focus({ preventScroll: true });
+    } else {
+      focusReturnRef.current?.focus({ preventScroll: true });
+      focusReturnRef.current = null;
+    }
+    const timer = window.setTimeout(() => {
+      mapInstanceRef.current?.invalidateSize();
+      handleRecenter();
+    }, 320);
+    return () => window.clearTimeout(timer);
+  }, [isFullscreen, handleRecenter]);
 
   // Copia as coordenadas para a área de transferência com tratamento de Promise
   const handleCopyCoords = useCallback((coord: NormalizedCoordinate) => {
@@ -122,6 +163,7 @@ export default function AtlasMapInner() {
       alt: "Mapa canônico do Reino de Injorn",
     });
     overlay.addTo(map);
+    placesLayerRef.current = L.layerGroup().addTo(map);
 
     // Enquadra a arte completa inicialmente com padding responsivo
     map.fitBounds(bounds, {
@@ -145,6 +187,10 @@ export default function AtlasMapInner() {
 
     // Fixa coordenada ao clicar (útil para auditoria cartográfica e anotações M1)
     map.on("click", (event: L.LeafletMouseEvent) => {
+      if (
+        event.latlng.lat < 0 || event.latlng.lat > height ||
+        event.latlng.lng < 0 || event.latlng.lng > width
+      ) return;
       const norm = latLngToNormalized(event.latlng.lat, event.latlng.lng, width, height);
       setPinnedCoords(norm);
     });
@@ -156,59 +202,104 @@ export default function AtlasMapInner() {
     mapInstanceRef.current = map;
 
     // Observer para redimensionamento de janela ou rotação mobile
-    const handleResize = () => {
-      if (mapInstanceRef.current) {
-        mapInstanceRef.current.invalidateSize();
-      }
-    };
+    const handleResize = () => mapInstanceRef.current?.invalidateSize();
     window.addEventListener("resize", handleResize);
+    // O modo foco muda a área disponível sem necessariamente disparar resize na janela.
+    const resizeObserver = new ResizeObserver(handleResize);
+    resizeObserver.observe(mapContainerRef.current);
 
     return () => {
       window.removeEventListener("resize", handleResize);
+      resizeObserver.disconnect();
       if (rafId !== null) cancelAnimationFrame(rafId);
       map.remove();
+      placesLayerRef.current = null;
       mapInstanceRef.current = null;
     };
   }, [height, width]);
 
-  // Teclas de atalho contextuais (restritas ao foco do Atlas ou modo tela cheia)
+  // Criar apenas marcadores com texto já publicado e posição revisável.
+  useEffect(() => {
+    const layer = placesLayerRef.current;
+    if (!layer) return;
+    layer.clearLayers();
+    if (!showPlaces) return;
+
+    const needle = placeQuery.trim().toLocaleLowerCase("pt-BR");
+    for (const place of publicPlaces) {
+      if (!place.label.toLocaleLowerCase("pt-BR").includes(needle)) continue;
+      const selected = place.id === selectedPlaceId;
+      L.circleMarker(normalizedToLatLng(place.geometry), {
+        radius: selected ? 10 : 7,
+        color: selected ? "#ffffff" : "#f2dfae",
+        weight: selected ? 3 : 2,
+        fillColor: selected ? "#e6cc8d" : "#b78d4f",
+        fillOpacity: 0.92,
+        className: "atlas-place-marker",
+      })
+        .bindTooltip(place.label, { direction: "top", opacity: 0.96, offset: [0, -7] })
+        .on("click", (event) => {
+          L.DomEvent.stopPropagation(event);
+          setSelectedPlaceId(place.id);
+        })
+        .addTo(layer);
+    }
+  }, [placeQuery, selectedPlaceId, showPlaces]);
+
+  // Esc e Tab funcionam inclusive quando o foco está no campo de busca do catálogo.
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Ignorar se o usuário estiver digitando em campo de texto
-      if (
-        e.target instanceof HTMLInputElement ||
-        e.target instanceof HTMLTextAreaElement
-      ) {
-        return;
-      }
+      const frame = frameRef.current;
+      const activeElement = document.activeElement;
+      const isAtlasFocused = Boolean(
+        isFullscreen || (frame && activeElement && frame.contains(activeElement))
+      );
 
-      // Escape sempre fecha gaveta aberta ou tela cheia
-      if (e.key === "Escape") {
+      if (e.key === "Escape" && isAtlasFocused) {
         if (isDrawerOpen) {
+          e.preventDefault();
           setIsDrawerOpen(false);
           return;
         }
         if (isFullscreen) {
+          e.preventDefault();
           setIsFullscreen(false);
-          setTimeout(() => {
-            if (mapInstanceRef.current) {
-              mapInstanceRef.current.invalidateSize();
-              handleRecenter();
-            }
-          }, 200);
           return;
         }
       }
 
-      // Atalhos de navegação somente ativos com foco dentro do Atlas ou em tela cheia
-      const activeElement = document.activeElement;
-      const isAtlasFocused =
-        isFullscreen ||
-        (frameRef.current !== null &&
-          activeElement !== null &&
-          frameRef.current.contains(activeElement));
-
       if (!isAtlasFocused) return;
+
+      // Uma camada fixa modal não pode deixar o Tab alcançar elementos atrás dela.
+      if (isFullscreen && e.key === "Tab" && frame) {
+        const selectors = 'button:not(:disabled), input:not(:disabled), a[href], [tabindex]:not([tabindex="-1"])';
+        const focusables = Array.from(frame.querySelectorAll<HTMLElement>(selectors)).filter(
+          (element) => element.getClientRects().length > 0 &&
+            !element.closest('[aria-hidden="true"]')
+        );
+        const first = focusables[0];
+        const last = focusables[focusables.length - 1];
+        if (first && last) {
+          if (!activeElement || !frame.contains(activeElement)) {
+            e.preventDefault();
+            first.focus();
+          } else if (e.shiftKey && activeElement === first) {
+            e.preventDefault();
+            last.focus();
+          } else if (!e.shiftKey && activeElement === last) {
+            e.preventDefault();
+            first.focus();
+          }
+        }
+        return;
+      }
+
+      const target = e.target;
+      if (
+        target instanceof HTMLInputElement ||
+        target instanceof HTMLTextAreaElement ||
+        (target instanceof HTMLElement && target.isContentEditable)
+      ) return;
 
       if (e.key === "0" || e.key === "Home") {
         e.preventDefault();
@@ -232,12 +323,14 @@ export default function AtlasMapInner() {
   const activeCoord = pinnedCoords || cursorCoords;
 
   return (
+    <>
     <div
       ref={frameRef}
       className={`atlas-viewer-frame ${
         isFullscreen ? "atlas-viewer-frame--fullscreen" : ""
       }`}
-      role="region"
+      role={isFullscreen ? "dialog" : "region"}
+      aria-modal={isFullscreen ? true : undefined}
       aria-label="Atlas Vivo de Injorn — Mapa Canônico"
       tabIndex={-1}
     >
@@ -296,6 +389,7 @@ export default function AtlasMapInner() {
             <span className="atlas-btn__icon" aria-hidden="true">📜</span>
           </button>
           <button
+            ref={fullscreenButtonRef}
             type="button"
             className={`atlas-btn ${isFullscreen ? "atlas-btn--active" : ""}`}
             onClick={handleToggleFullscreen}
@@ -450,6 +544,17 @@ export default function AtlasMapInner() {
         </div>
         <span>Atlas Vivo · M0 Cartografia Canônica</span>
       </footer>
+    <AtlasPlacesDirectory
+      query={placeQuery}
+      onQueryChange={setPlaceQuery}
+      showPlaces={showPlaces}
+      onTogglePlaces={() => setShowPlaces((value) => !value)}
+      selectedId={selectedPlaceId}
+      isFullscreen={isFullscreen}
+      onSelect={handleSelectPlace}
+      onClear={() => setSelectedPlaceId(null)}
+    />
     </div>
+    </>
   );
 }

@@ -3,6 +3,9 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import crypto from "node:crypto";
 import path from "node:path";
+import { atlasPanOptions, atlasFitOptions } from "../src/components/atlas/atlasMotion.ts";
+import { publicPlaceRecordId } from "../src/content/placeRecord.ts";
+import { isolateOutsideAtlasDialog } from "../src/components/atlas/atlasModalIsolation.ts";
 import {
   canonicalKingdomMap,
   normalizedToLatLng,
@@ -105,21 +108,125 @@ test("Coordinate conversion resilience and clamping to [0, 1]", () => {
   assert.strictEqual(clampedExcess.y, 0);
 });
 
-test("Player knowledge policy compliance in data contracts", () => {
-  // Em M0, não deve existir nenhuma feição cartográfica inventada
-  assert.strictEqual(
-    canonicalFeatures.length,
-    0,
-    "Nenhuma feição geográfica fictícia ou não revisada deve estar populada em M0"
-  );
-
-  // Apenas a camada base está visível e travada; demais camadas aguardam M1/M3
-  const baseLayer = initialAtlasLayers.find((l) => l.id === "base");
-  assert.ok(baseLayer && baseLayer.visible && baseLayer.locked);
-
-  const unreadyLayers = initialAtlasLayers.filter((l) => l.id !== "base");
-  for (const layer of unreadyLayers) {
-    assert.strictEqual(layer.visible, false, `Camada ${layer.id} deve iniciar oculta`);
-    assert.ok(layer.badge, `Camada ${layer.id} deve ter badge de fase futura`);
+test("M1 map anchors are bounded, unique and restricted to published knowledge", () => {
+  const expected = new Set(["Capital Injorn", "Monastério de São Kael", "Vael Karun"]);
+  assert.deepStrictEqual(new Set(canonicalFeatures.map((feature) => feature.label)), expected);
+  assert.strictEqual(canonicalFeatures.length, 3, "Somente três âncoras revisáveis compõem M1");
+  const ids = new Set();
+  for (const feature of canonicalFeatures) {
+    assert.equal(feature.mapId, canonicalKingdomMap.id);
+    assert.equal(feature.published, true, "Dados do cliente devem ser explicitamente publicados");
+    assert.equal(feature.type, "marker");
+    assert.equal(feature.category, "place");
+    assert.ok(!Array.isArray(feature.geometry), "Marcadores devem ter posição pontual");
+    assert.ok(feature.geometry.x >= 0 && feature.geometry.x <= 1);
+    assert.ok(feature.geometry.y >= 0 && feature.geometry.y <= 1);
+    assert.ok(!ids.has(feature.id), "ID de âncora deve ser único");
+    ids.add(feature.id);
   }
+  assert.ok(!canonicalFeatures.some((feature) => feature.label === "Ponta da Luz"),
+    "Ponta da Luz não tem posição aprovada e não pode ganhar marcador suposto");
+});
+
+test("M1 layers expose only approved map features; routes remain empty", () => {
+  const base = initialAtlasLayers.find((layer) => layer.id === "base");
+  const places = initialAtlasLayers.find((layer) => layer.id === "places");
+  assert.equal(base?.visible, true);
+  assert.equal(base?.locked, true);
+  assert.equal(places?.visible, true);
+  assert.equal(places?.count, 3);
+  for (const layer of initialAtlasLayers.filter((entry) => entry.id !== "base" && entry.id !== "places")) {
+    assert.equal(layer.visible, false);
+    assert.equal(layer.count, 0);
+  }
+});
+
+test("M1 Leaflet panTo honors prefers-reduced-motion instead of forcing movement", () => {
+  assert.deepStrictEqual(atlasPanOptions(true), { animate: false });
+  assert.deepStrictEqual(atlasPanOptions(false), { animate: true, duration: 0.35 });
+  assert.deepStrictEqual(atlasFitOptions(true), { padding: [12, 12], animate: false });
+  assert.deepStrictEqual(atlasFitOptions(false), { padding: [12, 12], animate: true });
+});
+
+test("M1 public place links use stable normalized anchors", () => {
+  assert.equal(publicPlaceRecordId("Capital Injorn"), "lugar-capital-injorn");
+  assert.equal(publicPlaceRecordId("Monastério de São Kael"), "lugar-monasterio-de-sao-kael");
+  assert.equal(publicPlaceRecordId("Vael Karun"), "lugar-vael-karun");
+});
+
+test("M1 focus isolates global siblings and restores previous inert values", () => {
+  class FakeElement {
+    constructor() {
+      this.children = [];
+      this.parentElement = null;
+      this.inert = false;
+    }
+    append(...children) {
+      for (const child of children) {
+        child.parentElement = this;
+        this.children.push(child);
+      }
+      return this;
+    }
+  }
+
+  const previousHTMLElement = globalThis.HTMLElement;
+  globalThis.HTMLElement = FakeElement;
+  try {
+    const body = new FakeElement();
+    const sevenGates = new FakeElement();
+    const sevenSeals = new FakeElement();
+    const page = new FakeElement();
+    const header = new FakeElement();
+    const mapSection = new FakeElement();
+    const footer = new FakeElement();
+    const frame = new FakeElement();
+    const atlasButton = new FakeElement();
+    const catalog = new FakeElement();
+    const originalInert = new FakeElement();
+    originalInert.inert = true;
+    body.append(sevenGates, sevenSeals, page, originalInert);
+    page.append(header, mapSection, footer);
+    mapSection.append(frame);
+    frame.append(atlasButton, catalog);
+
+    const restore = isolateOutsideAtlasDialog(frame, body);
+    assert.equal(sevenGates.inert, true, "Astrolábio deve ficar inerte");
+    assert.equal(sevenSeals.inert, true, "Sete Selos devem ficar inertes");
+    assert.equal(header.inert, true, "Cabeçalho externo deve ficar inerte");
+    assert.equal(footer.inert, true, "Conteúdo externo deve ficar inerte");
+    assert.equal(atlasButton.inert, false, "Controles do Atlas permanecem operantes");
+    assert.equal(catalog.inert, false, "Catálogo continua acessível");
+
+    restore();
+    assert.equal(sevenGates.inert, false, "Astrolábio deve voltar ao estado normal");
+    assert.equal(sevenSeals.inert, false);
+    assert.equal(header.inert, false);
+    assert.equal(footer.inert, false);
+    assert.equal(originalInert.inert, true, "Preservar estado inert que já existia");
+  } finally {
+    if (previousHTMLElement === undefined) delete globalThis.HTMLElement;
+    else globalThis.HTMLElement = previousHTMLElement;
+  }
+});
+
+test("M1 CSS contracts keep Leaflet below toolbar and global overlays hidden in focus", () => {
+  const css = fs.readFileSync(path.resolve("src/app/atlas/atlas-places.css"), "utf8");
+  const readRule = (selector) => {
+    const start = css.lastIndexOf(selector + " {");
+    assert.ok(start >= 0, "Regra CSS não encontrada: " + selector);
+    const end = css.indexOf("}", start);
+    assert.ok(end > start, "Regra CSS incompleta: " + selector);
+    return css.slice(start, end);
+  };
+  const readZ = (rule) => Number(rule.split("z-index:")[1]?.trim().split(";")[0]);
+  const map = readRule(".atlas-viewer-frame .atlas-map-container");
+  const toolbar = readRule(".atlas-viewer-frame .atlas-toolbar");
+  const drawer = readRule(".atlas-viewer-frame .atlas-drawer");
+  assert.ok(map.includes("isolation: isolate"), "Pane precisa ter contexto isolado");
+  assert.ok(readZ(map) < readZ(toolbar), "Toolbar deve ficar acima da pane Leaflet");
+  assert.ok(readZ(toolbar) < readZ(drawer), "Drawer deve ficar acima da toolbar");
+  assert.ok(css.includes('body[data-injorn-atlas-focus="true"]'));
+  assert.ok(css.includes(".seven-gates-trigger"));
+  assert.ok(css.includes(".seven-seals-trigger"));
 });
