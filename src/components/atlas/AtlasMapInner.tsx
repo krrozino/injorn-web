@@ -7,17 +7,25 @@ import {
   canonicalKingdomMap,
   initialAtlasLayers,
   latLngToNormalized,
+  normalizedToLatLng,
 } from "@/content/atlas";
 import type { NormalizedCoordinate } from "@/types/atlas";
+import { AtlasPlacesDirectory, publicPlaces } from "@/components/atlas/AtlasPlacesDirectory";
 
 export default function AtlasMapInner() {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const frameRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<L.Map | null>(null);
+  const placesLayerRef = useRef<L.LayerGroup | null>(null);
 
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const layers = initialAtlasLayers;
+  const [showPlaces, setShowPlaces] = useState(true);
+  const [placeQuery, setPlaceQuery] = useState("");
+  const [selectedPlaceId, setSelectedPlaceId] = useState<string | null>(null);
+  const layers = initialAtlasLayers.map((layer) =>
+    layer.id === "places" ? { ...layer, visible: showPlaces } : layer
+  );
   const [cursorCoords, setCursorCoords] = useState<NormalizedCoordinate | null>(null);
   const [pinnedCoords, setPinnedCoords] = useState<NormalizedCoordinate | null>(null);
   const [copyNotice, setCopyNotice] = useState<string | null>(null);
@@ -61,6 +69,16 @@ export default function AtlasMapInner() {
       return next;
     });
   }, [handleRecenter]);
+
+  const handleSelectPlace = useCallback((id: string) => {
+    const place = publicPlaces.find((entry) => entry.id === id);
+    if (!place) return;
+    setSelectedPlaceId(place.id);
+    mapInstanceRef.current?.panTo(normalizedToLatLng(place.geometry), {
+      animate: true,
+      duration: 0.35,
+    });
+  }, []);
 
   // Copia as coordenadas para a área de transferência com tratamento de Promise
   const handleCopyCoords = useCallback((coord: NormalizedCoordinate) => {
@@ -122,6 +140,7 @@ export default function AtlasMapInner() {
       alt: "Mapa canônico do Reino de Injorn",
     });
     overlay.addTo(map);
+    placesLayerRef.current = L.layerGroup().addTo(map);
 
     // Enquadra a arte completa inicialmente com padding responsivo
     map.fitBounds(bounds, {
@@ -145,6 +164,10 @@ export default function AtlasMapInner() {
 
     // Fixa coordenada ao clicar (útil para auditoria cartográfica e anotações M1)
     map.on("click", (event: L.LeafletMouseEvent) => {
+      if (
+        event.latlng.lat < 0 || event.latlng.lat > height ||
+        event.latlng.lng < 0 || event.latlng.lng > width
+      ) return;
       const norm = latLngToNormalized(event.latlng.lat, event.latlng.lng, width, height);
       setPinnedCoords(norm);
     });
@@ -167,9 +190,38 @@ export default function AtlasMapInner() {
       window.removeEventListener("resize", handleResize);
       if (rafId !== null) cancelAnimationFrame(rafId);
       map.remove();
+      placesLayerRef.current = null;
       mapInstanceRef.current = null;
     };
   }, [height, width]);
+
+  // Criar apenas marcadores com texto já publicado e posição revisável.
+  useEffect(() => {
+    const layer = placesLayerRef.current;
+    if (!layer) return;
+    layer.clearLayers();
+    if (!showPlaces) return;
+
+    const needle = placeQuery.trim().toLocaleLowerCase("pt-BR");
+    for (const place of publicPlaces) {
+      if (!place.label.toLocaleLowerCase("pt-BR").includes(needle)) continue;
+      const selected = place.id === selectedPlaceId;
+      L.circleMarker(normalizedToLatLng(place.geometry), {
+        radius: selected ? 10 : 7,
+        color: selected ? "#ffffff" : "#f2dfae",
+        weight: selected ? 3 : 2,
+        fillColor: selected ? "#e6cc8d" : "#b78d4f",
+        fillOpacity: 0.92,
+        className: "atlas-place-marker",
+      })
+        .bindTooltip(place.label, { direction: "top", opacity: 0.96, offset: [0, -7] })
+        .on("click", (event) => {
+          L.DomEvent.stopPropagation(event);
+          setSelectedPlaceId(place.id);
+        })
+        .addTo(layer);
+    }
+  }, [placeQuery, selectedPlaceId, showPlaces]);
 
   // Teclas de atalho contextuais (restritas ao foco do Atlas ou modo tela cheia)
   useEffect(() => {
@@ -232,6 +284,7 @@ export default function AtlasMapInner() {
   const activeCoord = pinnedCoords || cursorCoords;
 
   return (
+    <>
     <div
       ref={frameRef}
       className={`atlas-viewer-frame ${
@@ -451,5 +504,15 @@ export default function AtlasMapInner() {
         <span>Atlas Vivo · M0 Cartografia Canônica</span>
       </footer>
     </div>
+    <AtlasPlacesDirectory
+      query={placeQuery}
+      onQueryChange={setPlaceQuery}
+      showPlaces={showPlaces}
+      onTogglePlaces={() => setShowPlaces((value) => !value)}
+      selectedId={selectedPlaceId}
+      onSelect={handleSelectPlace}
+      onClear={() => setSelectedPlaceId(null)}
+    />
+    </>
   );
 }
