@@ -44,7 +44,7 @@ export const initialAtlasLayers: MapLayer[] = [
     id: "places",
     label: "Lugares e Fortalezas",
     description:
-      "Três marcos cartográficos visíveis na arte original, sujeitos à homologação do mestre.",
+      "Três marcos cartográficos homologados pelo criador do mundo em 20/10/2026.",
     visible: true,
     count: 3,
     badge: "M1 · 3 pontos",
@@ -107,7 +107,7 @@ export function latLngToNormalized(
 
 /**
  * Pontos de M1 transcritos manualmente da imagem cartográfica canônica
- * (1448x1086 px); são *propostas de âncora* para aprovação pelo mestre.
+ * (1448x1086 px); foram homologados pelo mestre em 20/10/2026.
  * O texto exibido no painel vem exclusivamente de knownPlaces (já público).
  *
  * Referências de píxel revisadas na arte:
