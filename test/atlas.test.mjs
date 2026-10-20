@@ -5,6 +5,7 @@ import crypto from "node:crypto";
 import path from "node:path";
 import { atlasPanOptions, atlasFitOptions } from "../src/components/atlas/atlasMotion.ts";
 import { publicPlaceRecordId } from "../src/content/placeRecord.ts";
+import { isolateOutsideAtlasDialog } from "../src/components/atlas/atlasModalIsolation.ts";
 import {
   canonicalKingdomMap,
   normalizedToLatLng,
@@ -151,4 +152,80 @@ test("M1 public place links use stable normalized anchors", () => {
   assert.equal(publicPlaceRecordId("Capital Injorn"), "lugar-capital-injorn");
   assert.equal(publicPlaceRecordId("Monastério de São Kael"), "lugar-monasterio-de-sao-kael");
   assert.equal(publicPlaceRecordId("Vael Karun"), "lugar-vael-karun");
+});
+
+test("M1 focus isolates global siblings and restores previous inert values", () => {
+  class FakeElement {
+    constructor() {
+      this.children = [];
+      this.parentElement = null;
+      this.inert = false;
+    }
+    append(...children) {
+      for (const child of children) {
+        child.parentElement = this;
+        this.children.push(child);
+      }
+      return this;
+    }
+  }
+
+  const previousHTMLElement = globalThis.HTMLElement;
+  globalThis.HTMLElement = FakeElement;
+  try {
+    const body = new FakeElement();
+    const sevenGates = new FakeElement();
+    const sevenSeals = new FakeElement();
+    const page = new FakeElement();
+    const header = new FakeElement();
+    const mapSection = new FakeElement();
+    const footer = new FakeElement();
+    const frame = new FakeElement();
+    const atlasButton = new FakeElement();
+    const catalog = new FakeElement();
+    const originalInert = new FakeElement();
+    originalInert.inert = true;
+    body.append(sevenGates, sevenSeals, page, originalInert);
+    page.append(header, mapSection, footer);
+    mapSection.append(frame);
+    frame.append(atlasButton, catalog);
+
+    const restore = isolateOutsideAtlasDialog(frame, body);
+    assert.equal(sevenGates.inert, true, "Astrolábio deve ficar inerte");
+    assert.equal(sevenSeals.inert, true, "Sete Selos devem ficar inertes");
+    assert.equal(header.inert, true, "Cabeçalho externo deve ficar inerte");
+    assert.equal(footer.inert, true, "Conteúdo externo deve ficar inerte");
+    assert.equal(atlasButton.inert, false, "Controles do Atlas permanecem operantes");
+    assert.equal(catalog.inert, false, "Catálogo continua acessível");
+
+    restore();
+    assert.equal(sevenGates.inert, false, "Astrolábio deve voltar ao estado normal");
+    assert.equal(sevenSeals.inert, false);
+    assert.equal(header.inert, false);
+    assert.equal(footer.inert, false);
+    assert.equal(originalInert.inert, true, "Preservar estado inert que já existia");
+  } finally {
+    if (previousHTMLElement === undefined) delete globalThis.HTMLElement;
+    else globalThis.HTMLElement = previousHTMLElement;
+  }
+});
+
+test("M1 CSS contracts keep Leaflet below toolbar and global overlays hidden in focus", () => {
+  const css = fs.readFileSync(path.resolve("src/app/atlas/atlas-places.css"), "utf8");
+  const readRule = (selector) => {
+    const escaped = selector.replace(/[.*+?^${}()|[\\]\\]/g, "\\$&");
+    const match = css.match(new RegExp(escaped + "\\s*\\{([^}]+)\\}", "m"));
+    assert.ok(match, "Regra CSS não encontrada: " + selector);
+    return match[1];
+  };
+  const map = readRule(".atlas-viewer-frame .atlas-map-container");
+  const toolbar = readRule(".atlas-viewer-frame .atlas-toolbar");
+  const drawer = readRule(".atlas-viewer-frame .atlas-drawer");
+  const z = (rule) => Number(rule.match(/z-index:\\s*(\\d+)/)?.[1]);
+  assert.ok(/isolation:\\s*isolate/.test(map));
+  assert.ok(z(map) < z(toolbar), "Toolbar deve ficar acima de toda pane Leaflet");
+  assert.ok(z(toolbar) < z(drawer), "Drawer deve ficar acima da toolbar");
+  assert.match(css, /body\\[data-injorn-atlas-focus="true"\\]/);
+  assert.match(css, /\\.seven-gates-trigger/);
+  assert.match(css, /\\.seven-seals-trigger/);
 });
