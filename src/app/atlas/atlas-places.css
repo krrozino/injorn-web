@@ -1,0 +1,91 @@
+/* M1 — catálogo e detalhes de lugares já publicados. */
+.atlas-places-catalog {
+  margin-top: 1.25rem;
+  border: 1px solid rgba(202, 166, 93, 0.28);
+  background: linear-gradient(140deg, rgba(13, 30, 20, .96), rgba(5, 10, 7, .98));
+  color: var(--injorn-gold-300);
+}
+.atlas-places-catalog__heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding: 1.45rem 1.5rem;
+  border-bottom: 1px solid rgba(202, 166, 93, .23);
+}
+.atlas-places-catalog__heading h2,
+.atlas-place-detail h3 {
+  margin: .3rem 0;
+  font-family: var(--font-display), serif;
+  font-size: clamp(1.55rem, 3vw, 2.25rem);
+  color: #f1e3c2;
+}
+.atlas-places-catalog__heading p,
+.atlas-place-detail p { margin: .5rem 0 0; color: rgba(239, 229, 203, .77); line-height: 1.65; }
+.atlas-places-catalog__kicker { font-size: .68rem; letter-spacing: .13em; text-transform: uppercase; color: var(--injorn-gold-500); }
+.atlas-places-toggle, .atlas-place-detail__actions button {
+  padding: .65rem .9rem;
+  border: 1px solid rgba(202, 166, 93, .55);
+  color: #f1e3c2;
+  background: rgba(202, 166, 93, .11);
+  cursor: pointer;
+}
+.atlas-places-toggle:focus-visible,
+.atlas-place-entry:focus-visible,
+.atlas-places-directory input:focus-visible,
+.atlas-place-detail__actions button:focus-visible {
+  outline: 2px solid #e6cc8d;
+  outline-offset: 3px;
+}
+.atlas-places-catalog__body { display: grid; grid-template-columns: minmax(230px, .9fr) minmax(0, 1.7fr); }
+.atlas-places-directory {
+  padding: 1.35rem;
+  border-right: 1px solid rgba(202, 166, 93, .2);
+}
+.atlas-places-directory label { display: block; font-size: .81rem; font-weight: 700; margin-bottom: .65rem; }
+.atlas-places-directory input {
+  width: 100%;
+  min-height: 44px;
+  border: 1px solid rgba(202,166,93,.35);
+  border-radius: 0;
+  background: rgba(0,0,0,.32);
+  color: #fff;
+  padding: .65rem .8rem;
+  font: inherit;
+}
+.atlas-places-directory input::placeholder { color: rgba(239, 229, 203, .46); }
+.atlas-places-directory__list { margin-top: 1rem; display: grid; gap: .45rem; }
+.atlas-place-entry {
+  display: grid;
+  gap: .35rem;
+  padding: .85rem .95rem;
+  border: 1px solid rgba(202, 166, 93, .15);
+  text-align: left;
+  background: rgba(202, 166, 93, .045);
+  color: #f1e3c2;
+  cursor: pointer;
+  transition: background 150ms ease, border-color 150ms ease;
+}
+.atlas-place-entry:hover, .atlas-place-entry--selected {
+  border-color: rgba(202,166,93,.62);
+  background: rgba(202,166,93,.15);
+}
+.atlas-place-entry strong { font: 600 1.15rem var(--font-display), serif; }
+.atlas-place-entry span { color: rgba(239,229,203,.57); font-size: .75rem; }
+.atlas-places-directory__notice,
+.atlas-places-directory__empty { font-size: .77rem; line-height: 1.6; color: rgba(239,229,203,.6); }
+.atlas-places-directory__notice { margin: 1rem 0 0; }
+.atlas-place-detail { min-height: 16rem; padding: clamp(1.25rem, 3vw, 2rem); }
+.atlas-place-detail ul { margin: 1.3rem 0; display: grid; gap: .65rem; padding-left: 1.1rem; color: rgba(239,229,203,.75); line-height: 1.55; }
+.atlas-place-detail li::marker { color: var(--injorn-gold-500); }
+.atlas-place-detail__actions { display: flex; flex-wrap: wrap; gap: .7rem; margin-top: 1.5rem; }
+.atlas-place-marker { cursor: pointer; filter: drop-shadow(0 0 4px rgba(0,0,0,.85)); }
+@media (max-width: 720px) {
+  .atlas-places-catalog__heading { align-items: flex-start; flex-direction: column; }
+  .atlas-places-catalog__body { grid-template-columns: 1fr; }
+  .atlas-places-directory { border-right: 0; border-bottom: 1px solid rgba(202,166,93,.2); }
+  .atlas-place-detail { min-height: 12rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .atlas-place-entry { transition: none; }
+}
