@@ -538,6 +538,7 @@ export default function AtlasMapInner() {
       showPlaces={showPlaces}
       onTogglePlaces={() => setShowPlaces((value) => !value)}
       selectedId={selectedPlaceId}
+      isFullscreen={isFullscreen}
       onSelect={handleSelectPlace}
       onClear={() => setSelectedPlaceId(null)}
     />
