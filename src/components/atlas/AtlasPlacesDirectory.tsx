@@ -1,5 +1,10 @@
 "use client";
 
+import { useEffect, useRef } from "react";
+import Link from "next/link";
+import { KnowledgeStatus } from "@/components/KnowledgeStatus";
+import { publicPlaceRecordId } from "@/content/placeRecord";
+
 import { knownPlaces } from "@/content/playerKnowledge";
 import { canonicalFeatures } from "@/content/atlas";
 import type { GeoFeature, NormalizedCoordinate } from "@/types/atlas";
@@ -25,6 +30,7 @@ interface AtlasPlacesDirectoryProps {
   showPlaces: boolean;
   onTogglePlaces: () => void;
   selectedId: string | null;
+  isFullscreen: boolean;
   onSelect: (id: string) => void;
   onClear: () => void;
 }
@@ -35,9 +41,23 @@ export function AtlasPlacesDirectory({
   showPlaces,
   onTogglePlaces,
   selectedId,
+  isFullscreen,
   onSelect,
   onClear,
 }: AtlasPlacesDirectoryProps) {
+  const catalogRef = useRef<HTMLElement>(null);
+  const detailsRef = useRef<HTMLElement>(null);
+  useEffect(() => {
+    if (!isFullscreen || !selectedId) return;
+    // A ficha selecionada deve ficar visível até em telas de 320px.
+    const catalog = catalogRef.current;
+    const details = detailsRef.current;
+    if (catalog && details) {
+      const target = details.getBoundingClientRect().top - catalog.getBoundingClientRect().top;
+      catalog.scrollTop += target - 12;
+    }
+  }, [isFullscreen, selectedId]);
+
   const filtered = publicPlaces.filter((place) =>
     place.label.toLocaleLowerCase("pt-BR").includes(query.trim().toLocaleLowerCase("pt-BR"))
   );
@@ -47,7 +67,7 @@ export function AtlasPlacesDirectory({
     : undefined;
 
   return (
-    <section className="atlas-places-catalog" aria-labelledby="atlas-places-title">
+    <section ref={catalogRef} className="atlas-places-catalog" aria-labelledby="atlas-places-title">
       <div className="atlas-places-catalog__heading">
         <div>
           <span className="atlas-places-catalog__kicker">Cartografia documentada · M1</span>
@@ -93,15 +113,17 @@ export function AtlasPlacesDirectory({
             Outros registros, como Ponta da Luz, aguardam confirmação exata de sua posição no mapa.
           </p>
         </div>
-        <article className="atlas-place-detail" aria-live="polite">
+        <article ref={detailsRef} className="atlas-place-detail" aria-live="polite">
           {selectedFeature && selectedRecord ? (
             <>
               <span className="atlas-places-catalog__kicker">Registro público · {selectedRecord.kind}</span>
+              <KnowledgeStatus status={selectedRecord.status} />
               <h3>{selectedFeature.label}</h3>
               <p>{selectedRecord.summary}</p>
               <ul>{selectedRecord.details.map((detail) => <li key={detail}>{detail}</li>)}</ul>
               <div className="atlas-place-detail__actions">
                 <button type="button" onClick={() => onSelect(selectedFeature.id)}>Centralizar no mapa</button>
+                <Link href={`/mundo#${publicPlaceRecordId(selectedRecord.name)}`}>Abrir registro público no Mundo</Link>
                 <button type="button" onClick={onClear}>Limpar seleção</button>
               </div>
             </>
