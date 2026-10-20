@@ -22,7 +22,7 @@ O Notion continua sendo a **Bíblia Viva**, a fonte principal de escrita/cânone
 - Suportar mapas de detalhe vinculados a mapas superiores.
 - Studio: editor inicialmente exclusivo do proprietário; desenho visual de marcadores, polígonos e linhas, sem digitação obrigatória de coordenadas.
 - Sincronização Notion/Drive: detectar mudanças e preparar revisão, **publicar somente com aprovação**.
-- **Custo recorrente obrigatório: R$ 0**. Não contratar upgrades, billing por uso, domínios pagos ou serviços novos cobrados.
+- **Meta operacional: R$ 0/mês**. Firebase é o backend escolhido. Pode-se evoluir do Spark para o Blaze com aprovação explícita do proprietário, desde que exista avaliação de risco/cotas; o Blaze é pagamento por uso, não tem garantia técnica de custo zero. Não ativar faturamento, domínio pago ou outros gastos sem nova autorização explícita.
 
 ## 3. Navegação proposta
 - **Atlas**: mapa ilustrado, zoom/pan, lugares, regiões, camadas, busca, painel com ligações.
@@ -82,15 +82,19 @@ Reproduzir jornada como trilha da Sociedade do Anel: pontos, caminhos, eventos e
 - Ciclo sugerido: verificação programada de alterações, fila de revisão e publicação após comando do proprietário; em caso de conflito, nunca sobrescrever silenciosamente.
 - Não duplicar um editor completo de textos no Studio inicialmente: manter edição textual no Notion e edição espacial/associações no Studio.
 
-## 9. Arquitetura de custo zero
-- Site: Next.js + Vercel Hobby **somente para projeto pessoal não comercial**.
-- Mapa: Leaflet (open source), imagem própria; sem APIs pagas de mapa.
-- Conteúdo publicado: preferir snapshot estático no build/CDN, para que acessos públicos não gerem consultas ao Notion/Drive/Supabase em tempo real.
-- Autenticação, coordenadas autoradas, fila editorial: avaliar Supabase Free no momento da implementação do Studio, com RLS e credenciais exclusivamente no servidor. Projeto gratuito pode pausar com baixa atividade; o atlas público deve continuar funcionando mesmo assim.
-- Alternativa/primeiro MVP: dados públicos estáticos e trabalho editorial manual/revisado no repositório; Studio e banco só quando necessários.
-- Google Drive API: operar abaixo das cotas, sem habilitar cobrança automática. Google anunciou ajustes/cobranças para usos acima das quotas; vigiar antes de ativar serviços Google Cloud.
-- Vercel Hobby, Notion, Supabase e Google Drive possuem quotas e políticas mutáveis: custo zero é requisito com **degradação/bloqueio ao atingir limites**, não promessa de recursos ilimitados.
-- Evitar serviços dependentes de cartão, domínio pago, armazenamento de áudio gigantesco e qualquer upgrade silencioso.
+## 9. Arquitetura Firebase com meta de custo zero
+- **Backend decidido**: Firebase Authentication para o proprietário do Studio; Cloud Firestore para coordenadas, camadas, rotas, relacionamentos, estados de revisão e versões de publicação. Sem Supabase para Injorn.
+- **Hospedagem inicial**: site Next.js existente na Vercel Hobby, para uso pessoal não comercial, preservando integrações que precisam de servidor. Firebase Hosting estático pode ser avaliado posteriormente, se a exportação estática for compatível; Firebase App Hosting não é requisito.
+- **Mapa**: Leaflet (open source) com imagem autoral. Sem API paga de mapa.
+- **Conteúdo público**: gerar snapshot previamente aprovado para hospedar em CDN/static build; o visitante não acessa Firestore privado, Notion ou Drive diretamente a cada visita.
+- **Mídias**: Google Drive permanece acervo mestre. Em Blaze, Cloud Storage for Firebase pode receber **somente cópias aprovadas para publicação**, preferencialmente em bucket/região elegível ao nível Always Free (validar região, cota e preço antes de criar). Não usar URLs temporárias de itens privados do Drive em páginas públicas.
+- **Sincronização**: serviços autenticados no servidor, processando mudanças do Notion/Drive de maneira incremental, com fila de revisão. Cloud Functions pode ser avaliado no Blaze, mas não é obrigatório: builds/deploys de funções podem ter cobranças de armazenamento de contêiner e consumo de serviços complementares mesmo quando invocações estão dentro da cota.
+- **Plano**: iniciar Spark se os recursos do MVP couberem nele; permitir futura migração ao **Blaze por decisão explícita**. Blaze é faturado por uso acima das cotas; vincular faturamento não representa promessa de fatura R$ 0.
+- **Controles obrigatórios antes de ativar Blaze**: orçamento e alertas no Cloud Billing (limiares baixos); acompanhar uso por serviço; restringir permissões administrativas; consultas paginadas com limites; cache e snapshots; limites de escala/concurrency/quotas onde disponíveis; testes com Firebase Emulator; revisão dos custos da região de Storage e deploy de Functions; política de desativação/redução de uso e de rollback.
+- **Alertas não são limites rígidos**: orçamento de alerta não pausa serviços. Spend caps existem apenas para determinados produtos e podem ter atraso, por isso não garantem cobrança zero — Firestore e Storage não recebem o mesmo mecanismo universal de bloqueio. Evitar automações que possam disparar leituras/gravações ilimitadas.
+- **Cotas e custo**: manter consumo normalmente bem abaixo dos limites gratuitos e usar o menor número de serviços possível. Se os limites forem ameaçados, reduzir/pausar **novas operações opcionais**; mesmo assim a arquitetura no Blaze possui risco residual de cobrança.
+- **Governança**: ninguém deve habilitar Blaze, vincular cartão/billing, contratar recursos pagos ou alterar projetos sem aprovação explícita adicional. Toda decisão sobre ativação deve documentar região, cota gratuita, custo excedente, monitoramento e contingência.
+- **Fonte de orientação a rever no dia do provisionamento**: https://firebase.google.com/docs/projects/billing/firebase-pricing-plans ; https://firebase.google.com/docs/projects/billing/budget-alerts ; https://firebase.google.com/docs/projects/billing/spend-caps ; https://firebase.google.com/docs/storage/faqs-storage-changes-announced-sept-2024 ; https://firebase.google.com/docs/functions/quotas .
 
 ## 10. Entregas incrementalmente verificáveis
 1. **M0: base cartográfica** — incorporar imagem original aprovada; zoom/pan, responsividade, coordenadas normalizadas, camadas e legenda. Mapas sem rótulos quando enviados.
@@ -112,4 +116,4 @@ Critérios iniciais: nenhum conteúdo inventado; nenhuma publicação acidental;
 - Decidir quais tipos de conhecimento histórico total podem ser disponibilizados imediatamente e quais exigem liberação editorial.
 
 ## 12. Padrão de entrega
-PRs separados; preview em Vercel antes de main. Este documento **não** autoriza publicar automaticamente páginas do Notion nem habilitar pagamentos/planos pagos.
+PRs separados; preview em Vercel antes de main. Este documento **não** autoriza publicar automaticamente páginas do Notion, fazer upgrade para Blaze ou vincular faturamento. Apenas registra que Blaze é uma evolução permitida após autorização explícita.
