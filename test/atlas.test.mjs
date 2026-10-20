@@ -105,21 +105,35 @@ test("Coordinate conversion resilience and clamping to [0, 1]", () => {
   assert.strictEqual(clampedExcess.y, 0);
 });
 
-test("Player knowledge policy compliance in data contracts", () => {
-  // Em M0, não deve existir nenhuma feição cartográfica inventada
-  assert.strictEqual(
-    canonicalFeatures.length,
-    0,
-    "Nenhuma feição geográfica fictícia ou não revisada deve estar populada em M0"
-  );
+test("M1 map anchors are bounded, unique and restricted to published knowledge", () => {
+  const expected = new Set(["Capital Injorn", "Monastério de São Kael", "Vael Karun"]);
+  assert.deepStrictEqual(new Set(canonicalFeatures.map((feature) => feature.label)), expected);
+  assert.strictEqual(canonicalFeatures.length, 3, "Somente três âncoras revisáveis compõem M1");
+  const ids = new Set();
+  for (const feature of canonicalFeatures) {
+    assert.equal(feature.mapId, canonicalKingdomMap.id);
+    assert.equal(feature.published, true, "Dados do cliente devem ser explicitamente publicados");
+    assert.equal(feature.type, "marker");
+    assert.equal(feature.category, "place");
+    assert.ok(!Array.isArray(feature.geometry), "Marcadores devem ter posição pontual");
+    assert.ok(feature.geometry.x >= 0 && feature.geometry.x <= 1);
+    assert.ok(feature.geometry.y >= 0 && feature.geometry.y <= 1);
+    assert.ok(!ids.has(feature.id), "ID de âncora deve ser único");
+    ids.add(feature.id);
+  }
+  assert.ok(!canonicalFeatures.some((feature) => feature.label === "Ponta da Luz"),
+    "Ponta da Luz não tem posição aprovada e não pode ganhar marcador suposto");
+});
 
-  // Apenas a camada base está visível e travada; demais camadas aguardam M1/M3
-  const baseLayer = initialAtlasLayers.find((l) => l.id === "base");
-  assert.ok(baseLayer && baseLayer.visible && baseLayer.locked);
-
-  const unreadyLayers = initialAtlasLayers.filter((l) => l.id !== "base");
-  for (const layer of unreadyLayers) {
-    assert.strictEqual(layer.visible, false, `Camada ${layer.id} deve iniciar oculta`);
-    assert.ok(layer.badge, `Camada ${layer.id} deve ter badge de fase futura`);
+test("M1 layers expose only approved map features; routes remain empty", () => {
+  const base = initialAtlasLayers.find((layer) => layer.id === "base");
+  const places = initialAtlasLayers.find((layer) => layer.id === "places");
+  assert.equal(base?.visible, true);
+  assert.equal(base?.locked, true);
+  assert.equal(places?.visible, true);
+  assert.equal(places?.count, 3);
+  for (const layer of initialAtlasLayers.filter((entry) => entry.id !== "base" && entry.id !== "places")) {
+    assert.equal(layer.visible, false);
+    assert.equal(layer.count, 0);
   }
 });
