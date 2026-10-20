@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { KnowledgeStatus } from "@/components/KnowledgeStatus";
 import { PublicPage } from "@/components/PublicPage";
 import { RouteCompass } from "@/components/RouteCompass";
@@ -19,6 +20,26 @@ export default function MundoPage() {
       <section className="knowledge-boundary" aria-label="Limite de conhecimento">
         <span>{spoilerBoundary.label}</span>
         <p>{spoilerBoundary.note}</p>
+      </section>
+
+      {/* Portal de Acesso ao Atlas Vivo Canônico */}
+      <section className="atlas-portal-card" aria-labelledby="atlas-portal-title">
+        <div className="atlas-portal-card__content">
+          <div className="atlas-portal-card__heading">
+            <h2 id="atlas-portal-title" className="atlas-portal-card__title">
+              ✦ Atlas Vivo — Mapa Canônico do Reino
+            </h2>
+            <KnowledgeStatus status="official" />
+          </div>
+          <p className="atlas-portal-card__text">
+            Explore a primeira versão navegável da arte cartográfica original de Injorn (1448 × 1086 px),
+            com movimentação fluida, controle de zoom, atalhos de teclado e sistema de coordenadas
+            normalizadas.
+          </p>
+        </div>
+        <Link href="/atlas" className="atlas-portal-card__btn">
+          Abrir Atlas Vivo navegável →
+        </Link>
       </section>
 
       <section className="lore-section" aria-labelledby="reino-title">
