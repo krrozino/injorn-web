@@ -179,3 +179,40 @@
     display: none;
   }
 }
+
+/* P2 — Stacking: Leaflet owns a separate, lowest painting context.
+ * Its panes use z-index internally; these values must never compete with
+ * the top-level map toolbar/drawer after zoom, pan or invalidateSize. */
+.atlas-viewer-frame {
+  isolation: isolate;
+}
+.atlas-viewer-frame .atlas-map-container {
+  position: relative;
+  z-index: 0;
+  isolation: isolate;
+}
+.atlas-viewer-frame .atlas-toolbar { z-index: 850; }
+.atlas-viewer-frame .atlas-drawer { z-index: 860; }
+.atlas-viewer-frame .atlas-inspector-badge { z-index: 830; }
+.atlas-viewer-frame .atlas-viewer-footer { z-index: 810; }
+.atlas-viewer-frame--fullscreen {
+  z-index: 2200;
+}
+
+/* Em foco, os widgets globais não podem abrir outros modais nem cobrir o
+ * catálogo. O hook também aplica inert aos irmãos do diálogo, removendo-os
+ * do Tab e da árvore de acessibilidade; CSS complementa o isolamento visual. */
+body[data-injorn-atlas-focus="true"] {
+  overflow: hidden;
+}
+body[data-injorn-atlas-focus="true"] :is(
+  .seven-gates-trigger,
+  .seven-gates,
+  .seven-seals-trigger,
+  .seven-seals,
+  .dissonance-toggle,
+  .archive-breath
+) {
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
