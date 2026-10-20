@@ -12,6 +12,7 @@ import {
 import type { NormalizedCoordinate } from "@/types/atlas";
 import { AtlasPlacesDirectory, publicPlaces } from "@/components/atlas/AtlasPlacesDirectory";
 import { atlasPanOptions, atlasFitOptions } from "@/components/atlas/atlasMotion";
+import { isolateOutsideAtlasDialog } from "@/components/atlas/atlasModalIsolation";
 
 export default function AtlasMapInner() {
   const mapContainerRef = useRef<HTMLDivElement>(null);
@@ -72,32 +73,13 @@ export default function AtlasMapInner() {
     mapInstanceRef.current?.panTo(normalizedToLatLng(place.geometry), atlasPanOptions(reduceMotion));
   }, []);
 
-  // Modal real: retirar controles externos da ordem de foco e da hit-testing.
-  // Percorrer os ancestrais permite isolar inclusive widgets do layout global
-  // sem alterar o estado nem o código dos componentes Sete Portas/Sete Selos.
+  // Isolar controle de foco e clique fora do painel enquanto o modo foco estiver aberto.
   useLayoutEffect(() => {
     if (!isFullscreen || !frameRef.current) return;
-
-    const frame = frameRef.current;
-    const restored: Array<{ element: HTMLElement; inert: boolean }> = [];
-    let current: HTMLElement | null = frame;
-
-    while (current && current !== document.body) {
-      const parent: HTMLElement | null = current.parentElement;
-      if (!parent) break;
-      for (const sibling of Array.from(parent.children)) {
-        if (sibling === current || !(sibling instanceof HTMLElement)) continue;
-        restored.push({ element: sibling, inert: sibling.inert });
-        sibling.inert = true;
-      }
-      current = parent;
-    }
-
+    const restore = isolateOutsideAtlasDialog(frameRef.current, document.body);
     document.body.dataset.injornAtlasFocus = "true";
     return () => {
-      for (const item of restored.reverse()) {
-        item.element.inert = item.inert;
-      }
+      restore();
       delete document.body.dataset.injornAtlasFocus;
     };
   }, [isFullscreen]);
