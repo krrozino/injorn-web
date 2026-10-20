@@ -213,19 +213,20 @@ test("M1 focus isolates global siblings and restores previous inert values", () 
 test("M1 CSS contracts keep Leaflet below toolbar and global overlays hidden in focus", () => {
   const css = fs.readFileSync(path.resolve("src/app/atlas/atlas-places.css"), "utf8");
   const readRule = (selector) => {
-    const escaped = selector.replace(/[.*+?^${}()|[\\]\\]/g, "\\$&");
-    const match = css.match(new RegExp(escaped + "\\s*\\{([^}]+)\\}", "m"));
-    assert.ok(match, "Regra CSS não encontrada: " + selector);
-    return match[1];
+    const start = css.lastIndexOf(selector + " {");
+    assert.ok(start >= 0, "Regra CSS não encontrada: " + selector);
+    const end = css.indexOf("}", start);
+    assert.ok(end > start, "Regra CSS incompleta: " + selector);
+    return css.slice(start, end);
   };
+  const readZ = (rule) => Number(rule.split("z-index:")[1]?.trim().split(";")[0]);
   const map = readRule(".atlas-viewer-frame .atlas-map-container");
   const toolbar = readRule(".atlas-viewer-frame .atlas-toolbar");
   const drawer = readRule(".atlas-viewer-frame .atlas-drawer");
-  const z = (rule) => Number(rule.match(/z-index:\\s*(\\d+)/)?.[1]);
-  assert.ok(/isolation:\\s*isolate/.test(map));
-  assert.ok(z(map) < z(toolbar), "Toolbar deve ficar acima de toda pane Leaflet");
-  assert.ok(z(toolbar) < z(drawer), "Drawer deve ficar acima da toolbar");
-  assert.match(css, /body\\[data-injorn-atlas-focus="true"\\]/);
-  assert.match(css, /\\.seven-gates-trigger/);
-  assert.match(css, /\\.seven-seals-trigger/);
+  assert.ok(map.includes("isolation: isolate"), "Pane precisa ter contexto isolado");
+  assert.ok(readZ(map) < readZ(toolbar), "Toolbar deve ficar acima da pane Leaflet");
+  assert.ok(readZ(toolbar) < readZ(drawer), "Drawer deve ficar acima da toolbar");
+  assert.ok(css.includes('body[data-injorn-atlas-focus="true"]'));
+  assert.ok(css.includes(".seven-gates-trigger"));
+  assert.ok(css.includes(".seven-seals-trigger"));
 });
