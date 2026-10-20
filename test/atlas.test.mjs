@@ -3,6 +3,8 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import crypto from "node:crypto";
 import path from "node:path";
+import { atlasPanOptions, atlasFitOptions } from "../src/components/atlas/atlasMotion.ts";
+import { publicPlaceRecordId } from "../src/content/placeRecord.ts";
 import {
   canonicalKingdomMap,
   normalizedToLatLng,
@@ -136,4 +138,17 @@ test("M1 layers expose only approved map features; routes remain empty", () => {
     assert.equal(layer.visible, false);
     assert.equal(layer.count, 0);
   }
+});
+
+test("M1 Leaflet panTo honors prefers-reduced-motion instead of forcing movement", () => {
+  assert.deepStrictEqual(atlasPanOptions(true), { animate: false });
+  assert.deepStrictEqual(atlasPanOptions(false), { animate: true, duration: 0.35 });
+  assert.deepStrictEqual(atlasFitOptions(true), { padding: [12, 12], animate: false });
+  assert.deepStrictEqual(atlasFitOptions(false), { padding: [12, 12], animate: true });
+});
+
+test("M1 public place links use stable normalized anchors", () => {
+  assert.equal(publicPlaceRecordId("Capital Injorn"), "lugar-capital-injorn");
+  assert.equal(publicPlaceRecordId("Monastério de São Kael"), "lugar-monasterio-de-sao-kael");
+  assert.equal(publicPlaceRecordId("Vael Karun"), "lugar-vael-karun");
 });
