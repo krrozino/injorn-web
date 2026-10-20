@@ -34,7 +34,7 @@ export default function AtlasMapInner() {
       [height, width],
     ];
     mapInstanceRef.current.fitBounds(bounds, {
-      padding: [24, 24],
+      padding: [12, 12],
       animate: true,
     });
   }, [height, width]);
@@ -50,27 +50,42 @@ export default function AtlasMapInner() {
 
   // Alterna o modo foco / expansão da tela
   const handleToggleFullscreen = useCallback(() => {
-    setIsFullscreen((prev) => !prev);
-    setTimeout(() => {
-      mapInstanceRef.current?.invalidateSize();
-    }, 200);
-  }, []);
+    setIsFullscreen((prev) => {
+      const next = !prev;
+      setTimeout(() => {
+        if (mapInstanceRef.current) {
+          mapInstanceRef.current.invalidateSize();
+          handleRecenter();
+        }
+      }, 200);
+      return next;
+    });
+  }, [handleRecenter]);
 
-  // Copia as coordenadas para a área de transferência
+  // Copia as coordenadas para a área de transferência com tratamento de Promise
   const handleCopyCoords = useCallback((coord: NormalizedCoordinate) => {
     const text = `x: ${coord.x.toFixed(4)}, y: ${coord.y.toFixed(4)}`;
     if (navigator?.clipboard?.writeText) {
-      navigator.clipboard.writeText(text);
-      setCopyNotice("Copiado!");
+      navigator.clipboard
+        .writeText(text)
+        .then(() => {
+          setCopyNotice("Copiado!");
+          setTimeout(() => setCopyNotice(null), 2000);
+        })
+        .catch(() => {
+          setCopyNotice("Erro ao copiar");
+          setTimeout(() => setCopyNotice(null), 2000);
+        });
+    } else {
+      setCopyNotice("Indisponível");
       setTimeout(() => setCopyNotice(null), 2000);
     }
   }, []);
 
-  // Inicialização do Leaflet com CRS.Simple
+  // Inicialização do Leaflet com CRS.Simple e suporte a mobile
   useEffect(() => {
     if (!mapContainerRef.current) return;
 
-    // Se já houver instância, destruir antes de recriar
     if (mapInstanceRef.current) {
       mapInstanceRef.current.remove();
       mapInstanceRef.current = null;
@@ -81,17 +96,18 @@ export default function AtlasMapInner() {
       [height, width],
     ];
 
-    // Limites de deslocamento com margem confortável para ver todas as bordas
+    // Limites de deslocamento com margem elástica para navegação confortável
     const maxBounds: L.LatLngBoundsExpression = [
-      [-height * 0.25, -width * 0.25],
-      [height * 1.25, width * 1.25],
+      [-height * 0.35, -width * 0.35],
+      [height * 1.35, width * 1.35],
     ];
 
+    // minZoom: -3.5 permite escala mínima de 2^-3.5 (~0.088x), acomodando telas de 320 px e 390 px com folga
     const map = L.map(mapContainerRef.current, {
       crs: L.CRS.Simple,
-      minZoom: -1.5,
+      minZoom: -3.5,
       maxZoom: 2.5,
-      zoomSnap: 0.25,
+      zoomSnap: 0.1,
       zoomDelta: 0.5,
       attributionControl: false,
       zoomControl: false,
@@ -107,19 +123,25 @@ export default function AtlasMapInner() {
     });
     overlay.addTo(map);
 
-    // Enquadra a arte completa inicialmente
+    // Enquadra a arte completa inicialmente com padding responsivo
     map.fitBounds(bounds, {
-      padding: [20, 20],
+      padding: [12, 12],
       animate: false,
     });
 
-    setZoomLevel(map.getZoom());
+    setZoomLevel(Number(map.getZoom().toFixed(2)));
 
-    // Rastreia coordenadas ao mover o cursor sobre o mapa
-    map.on("mousemove", (event: L.LeafletMouseEvent) => {
-      const norm = latLngToNormalized(event.latlng.lat, event.latlng.lng, width, height);
-      setCursorCoords(norm);
-    });
+    // Rastreamento de coordenadas com requestAnimationFrame para evitar jank
+    let rafId: number | null = null;
+    const onMouseMove = (event: L.LeafletMouseEvent) => {
+      if (rafId !== null) return;
+      rafId = requestAnimationFrame(() => {
+        rafId = null;
+        const norm = latLngToNormalized(event.latlng.lat, event.latlng.lng, width, height);
+        setCursorCoords(norm);
+      });
+    };
+    map.on("mousemove", onMouseMove);
 
     // Fixa coordenada ao clicar (útil para auditoria cartográfica e anotações M1)
     map.on("click", (event: L.LeafletMouseEvent) => {
@@ -133,13 +155,23 @@ export default function AtlasMapInner() {
 
     mapInstanceRef.current = map;
 
+    // Observer para redimensionamento de janela ou rotação mobile
+    const handleResize = () => {
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.invalidateSize();
+      }
+    };
+    window.addEventListener("resize", handleResize);
+
     return () => {
+      window.removeEventListener("resize", handleResize);
+      if (rafId !== null) cancelAnimationFrame(rafId);
       map.remove();
       mapInstanceRef.current = null;
     };
   }, [height, width]);
 
-  // Teclas de atalho para acessibilidade e navegação
+  // Teclas de atalho contextuais (restritas ao foco do Atlas ou modo tela cheia)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       // Ignorar se o usuário estiver digitando em campo de texto
@@ -149,6 +181,34 @@ export default function AtlasMapInner() {
       ) {
         return;
       }
+
+      // Escape sempre fecha gaveta aberta ou tela cheia
+      if (e.key === "Escape") {
+        if (isDrawerOpen) {
+          setIsDrawerOpen(false);
+          return;
+        }
+        if (isFullscreen) {
+          setIsFullscreen(false);
+          setTimeout(() => {
+            if (mapInstanceRef.current) {
+              mapInstanceRef.current.invalidateSize();
+              handleRecenter();
+            }
+          }, 200);
+          return;
+        }
+      }
+
+      // Atalhos de navegação somente ativos com foco dentro do Atlas ou em tela cheia
+      const activeElement = document.activeElement;
+      const isAtlasFocused =
+        isFullscreen ||
+        (frameRef.current !== null &&
+          activeElement !== null &&
+          frameRef.current.contains(activeElement));
+
+      if (!isAtlasFocused) return;
 
       if (e.key === "0" || e.key === "Home") {
         e.preventDefault();
@@ -162,12 +222,6 @@ export default function AtlasMapInner() {
       } else if (e.key === "f" || e.key === "F") {
         e.preventDefault();
         handleToggleFullscreen();
-      } else if (e.key === "Escape") {
-        if (isDrawerOpen) setIsDrawerOpen(false);
-        if (isFullscreen) {
-          setIsFullscreen(false);
-          setTimeout(() => mapInstanceRef.current?.invalidateSize(), 200);
-        }
       }
     };
 
@@ -185,6 +239,7 @@ export default function AtlasMapInner() {
       }`}
       role="region"
       aria-label="Atlas Vivo de Injorn — Mapa Canônico"
+      tabIndex={-1}
     >
       {/* Ornamentos de canto */}
       <div className="atlas-corner-ornament atlas-corner-ornament--tl" aria-hidden="true" />
@@ -264,7 +319,7 @@ export default function AtlasMapInner() {
         className="atlas-map-container"
         tabIndex={0}
         role="application"
-        aria-label="Área interativa do mapa. Use o mouse ou gestos de toque para mover e ampliar. Setas do teclado movimentam o mapa."
+        aria-label="Área interativa do mapa. Clique ou use tab para focar. Setas do teclado movimentam o mapa. Gestos de toque e pinça em mobile."
       />
 
       {/* Gaveta / Drawer de Camadas e Legenda */}
@@ -337,8 +392,10 @@ export default function AtlasMapInner() {
               <span className="atlas-meta-spec__val">WebP 86 (489 KB)</span>
             </div>
             <div>
-              <span className="atlas-meta-spec__label">Zoom Atual</span>
-              <span className="atlas-meta-spec__val">{zoomLevel}x</span>
+              <span className="atlas-meta-spec__label">Nível de Zoom</span>
+              <span className="atlas-meta-spec__val">
+                {zoomLevel} ({Math.round((2 ** zoomLevel) * 100)}%)
+              </span>
             </div>
           </div>
         </aside>
@@ -386,6 +443,9 @@ export default function AtlasMapInner() {
           </span>
           <span>
             Foco: <kbd>F</kbd>
+          </span>
+          <span>
+            Atalhos ativos com foco no Atlas
           </span>
         </div>
         <span>Atlas Vivo · M0 Cartografia Canônica</span>

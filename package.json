@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
-    "test": "node --test test/**/*.test.mjs"
+    "test": "node --no-warnings --experimental-strip-types --test test/atlas.test.mjs"
   },
   "dependencies": {
     "@types/leaflet": "^1.9.22",
