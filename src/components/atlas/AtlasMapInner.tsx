@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, useCallback } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import {
@@ -71,6 +71,36 @@ export default function AtlasMapInner() {
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     mapInstanceRef.current?.panTo(normalizedToLatLng(place.geometry), atlasPanOptions(reduceMotion));
   }, []);
+
+  // Modal real: retirar controles externos da ordem de foco e da hit-testing.
+  // Percorrer os ancestrais permite isolar inclusive widgets do layout global
+  // sem alterar o estado nem o código dos componentes Sete Portas/Sete Selos.
+  useLayoutEffect(() => {
+    if (!isFullscreen || !frameRef.current) return;
+
+    const frame = frameRef.current;
+    const restored: Array<{ element: HTMLElement; inert: boolean }> = [];
+    let current: HTMLElement | null = frame;
+
+    while (current && current !== document.body) {
+      const parent: HTMLElement | null = current.parentElement;
+      if (!parent) break;
+      for (const sibling of Array.from(parent.children)) {
+        if (sibling === current || !(sibling instanceof HTMLElement)) continue;
+        restored.push({ element: sibling, inert: sibling.inert });
+        sibling.inert = true;
+      }
+      current = parent;
+    }
+
+    document.body.dataset.injornAtlasFocus = "true";
+    return () => {
+      for (const item of restored.reverse()) {
+        item.element.inert = item.inert;
+      }
+      delete document.body.dataset.injornAtlasFocus;
+    };
+  }, [isFullscreen]);
 
   // Revalidar o tamanho após o layout mudar, restaurando o foco no retorno.
   useEffect(() => {
