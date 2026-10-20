@@ -23,17 +23,20 @@
 .atlas-places-catalog__heading p,
 .atlas-place-detail p { margin: .5rem 0 0; color: rgba(239, 229, 203, .77); line-height: 1.65; }
 .atlas-places-catalog__kicker { font-size: .68rem; letter-spacing: .13em; text-transform: uppercase; color: var(--injorn-gold-500); }
-.atlas-places-toggle, .atlas-place-detail__actions button {
+.atlas-places-toggle, .atlas-place-detail__actions button, .atlas-place-detail__actions a {
   padding: .65rem .9rem;
   border: 1px solid rgba(202, 166, 93, .55);
   color: #f1e3c2;
   background: rgba(202, 166, 93, .11);
   cursor: pointer;
+  text-decoration: none;
+  font-size: .82rem;
 }
 .atlas-places-toggle:focus-visible,
 .atlas-place-entry:focus-visible,
 .atlas-places-directory input:focus-visible,
-.atlas-place-detail__actions button:focus-visible {
+.atlas-place-detail__actions button:focus-visible,
+.atlas-place-detail__actions a:focus-visible {
   outline: 2px solid #e6cc8d;
   outline-offset: 3px;
 }
